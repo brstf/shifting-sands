@@ -1,0 +1,286 @@
+.montserrat {
+    font-family: 'Montserrat', sans-serif;
+}
+
+p {
+    font-family: 'Montserrat', sans-serif;
+}
+
+#history p {
+    margin: 0;
+}
+
+#history td {
+    padding: 8px;
+}
+
+#history th {
+    font-size: 16px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
+    text-align: left;
+    background-color: #679781;
+    color: #FFFFFF;
+    max-width: 200px;
+    word-wrap: break-word;
+}
+
+#history tr:nth-child(even){background-color: #f2f2f2;}
+
+#history .description p {
+    max-width: 400px;
+    word-wrap: break-word;
+}
+
+.modal-result {
+    font-size: 22px;
+    max-width: 700px;
+}
+
+.exit-index {
+    font-size: 18px;
+}
+
+#app {
+    height: 100%;
+    width: 100%;
+}
+
+.sidebar {
+    margin: 10px;
+    width: 250px;
+}
+
+.floor-header {
+    font-size: 18px;
+    padding-bottom: 10px;
+}
+
+.generate-dropdown {
+    font-size: 16px;
+}
+
+.main-panel {
+    overflow: hidden;
+    padding-top: 10px;
+    height: 100%;
+}
+
+.button-container {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 8px;
+}
+
+.slug-row {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    color: #212121;
+}
+
+.slug-header {
+    background-color: #679781;
+}
+
+.slug-row-even {
+    background-color: #e2fff2;
+}
+
+.slug-row-odd {
+    background-color: #f9fffc;
+}
+
+.slug-left {
+    width: 20em;
+    height: auto;
+    padding: 5px;
+}
+
+.slug-right {
+    width: 10em;
+    height: auto;
+    padding: 5px;
+}
+
+.menu-button {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2em;
+    text-align: center;
+    align-content: center;
+    color: #212121;
+    padding: 0 20px 0 20px;
+    background: #FFFFFF;
+    cursor: pointer;
+    /* background: #679781; */
+}
+
+.menu-button:hover {
+    color: #212121;
+    background: #a7d7c155;
+    /* background: #87b7a1; */
+}
+
+.button {
+    background: #679781;
+    color: #FFFFFF;
+}
+
+.button:hover {
+    background: #a7d7c1;
+}
+
+.tile {
+    width: 160px;
+    height: 160px;
+    position: relative;
+}
+
+.cell {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    align-content: center;
+}
+
+.room {
+    border: 2px solid #84c7a8;
+    text-align: center;
+}
+
+.north {
+    width: 2;
+    height: 40px;
+    position: absolute;
+    top: 0;
+    left: 80px;
+}
+
+.south {
+    width: 2;
+    height: 40px;
+    position: absolute;
+    top: 120px;
+    left: 80px;
+}
+
+.east {
+    width: 40px;
+    height: 2;
+    position: absolute;
+    top: 80px;
+    left: 120px;
+}
+
+.west {
+    width: 40px;
+    height: 2;
+    position: absolute;
+    top: 80px;
+    left: 0px;
+}
+
+.unexplored {
+    background: #9c9c9b;
+}
+
+.room-text {
+    color: #1c1c1c;
+    text-align: center;
+    margin: auto;
+    font-size: 30px;
+}
+
+.empty {
+    background: #ffffff;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+    padding-top: 5px;
+}
+
+li {
+    padding-left: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    color: #000000;
+}
+
+.explore-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.explore-button {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    pointer-events: auto;
+}
+
+.explore-button:hover {
+    background-color: #a7d7c155;
+}
+
+.explore-button-north {
+    left: 40px;
+    top: -40px;
+}
+
+.explore-button-south {
+    left: 40px;
+    top: 120px;
+}
+
+.explore-button-east {
+    left: 120px;
+    top: 40px;
+}
+
+.explore-button-west {
+    left: -40px;
+    top: 40px;
+}
+
+.explore-north {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%,0);
+}
+
+.explore-south {
+    bottom: -10px;
+    left: 50%;
+    transform: translate(-50%,0);
+}
+
+.explore-west {
+    left: 15px;
+    top: 50%;
+    transform: translate(0,-50%);
+}
+
+.explore-east {
+    right: 15px;
+    top: 50%;
+    transform: translate(0,-50%);
+}
+
+.explore-qm {
+    position: absolute;
+    font-size: 2.5em;
+    text-align: center;
+}
+
+.cell-menu {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
