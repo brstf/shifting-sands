@@ -103,6 +103,11 @@
       ^{:key (str coord dir)}
       [explore-button coord dir])]])
 
+(defn regenerate-button [coord from-dir]
+  [:div {:class "menu-button"
+         :on-click #(re-frame/dispatch [::events/regenerate-room coord from-dir])}
+   "Regenerate"])
+
 (defn encounter-button [coord room-map]
   [:div {:class "menu-button"
          :on-click #(re-frame/dispatch [::events/generate-encounter])}
@@ -148,8 +153,12 @@
               :size :smaller]
      :popover [re-com/popover-content-wrapper
                :on-cancel #(swap! showing? not)
+               :no-clip? true
                :body [re-com/v-box
-                      :children [[encounter-button coord room-map]
+                      :children [(when (::db/from-dir room-map)
+                                   [regenerate-button
+                                    coord (::db/from-dir room-map)])
+                                 [encounter-button coord room-map]
                                  [force-shop-button coord]
                                  [force-shrine-button coord]
                                  [rotate-button coord ::db/cw]
@@ -246,15 +255,13 @@
         slug-map (re-frame/subscribe [::subs/slug-map])]
     (when @show-slugs
       [re-com/modal-panel
+       :class "slug-panel"
        :backdrop-on-click #(re-frame/dispatch [::events/hide-slugs])
-       :child [re-com/scroller
-               :scroll :auto
-               :child
-               [re-com/v-box
-                :children [[slugs-header]
-                           (for [[idx slug-mapping]
-                                 (zipmap (range) @slug-map)]
-                             ^{:key idx} [slug-row idx slug-mapping])]]]])))
+       :child [re-com/v-box
+               :children [[slugs-header]
+                          (for [[idx slug-mapping]
+                                (zipmap (range) @slug-map)]
+                            ^{:key idx} [slug-row idx slug-mapping])]]])))
 
 (defn generate-button []
   [:div {:class "menu-button"
@@ -420,28 +427,28 @@
         formatter (time-format/formatter "yyyyMMdd hh:mm")]
     (when @show-history?
       [re-com/modal-panel
+       :class "history-panel"
        :backdrop-on-click #(re-frame/dispatch [::events/hide-history])
        :child
-       [re-com/scroller
-        :v-scroll :on
-        :child
-        [:table {:id "history"}
+       [:table {:id "history"}
+        [:thead
          [:tr
           [:th [:p [:b "Timestamp"]]]
           [:th [:p [:b "Floor"]]]
           [:th [:p [:b "Room" [:br] "Index"]]]
-          [:th [:p [:b "Description"]]]]
+          [:th [:p [:b "Description"]]]]]
+        [:tbody
          (for [[idx {:keys [description room-index floor time]}]
                (map-indexed (comp vec list) @history)]
-            ^{:key idx} [:tr
-                         [:td (time-format/unparse-local-date
-                               formatter
-                               (time/to-default-time-zone time))]
-                         [:td (keyword->display-str floor)]
-                         [:td {:style {:text-align "center"}}
-                          (str room-index)]
-                         [:td {:class "description"}
-                          (text->hiccup description)]])]]])))
+           ^{:key idx} [:tr
+                        [:td (time-format/unparse-local-date
+                              formatter
+                              (time/to-default-time-zone time))]
+                        [:td (keyword->display-str floor)]
+                        [:td {:style {:text-align "center"}}
+                         (str room-index)]
+                        [:td {:class "description"}
+                         (text->hiccup description)]])]]])))
 
 (defn main-panel []
   (let [modal-result (re-frame/subscribe [::subs/modal-result])
@@ -453,6 +460,7 @@
      :children
      [[re-com/h-box
        :height "100%"
+       :style {:flex-direction "row-reverse"}
        :children
        [[sidebar]
         [re-com/line :color aqua-green]

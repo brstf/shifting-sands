@@ -136,6 +136,12 @@
                  :floor floor
                  :time (time/now)})))))
 
+(defn generate-history-log [desc ridx floor]
+  {:description desc
+   :room-index ridx
+   :floor floor
+   :time (time/now)})
+
 (re-frame/reg-event-db
  ::generate-room
  (fn-traced
@@ -147,17 +153,39 @@
     (-> (assoc-in db [::db/floors floor] floor-state)
         (update
          ::db/history
-         #(conj % {:description (str "Generated room: "  (::db/name room))
-                   :room-index (::db/room-index room)
-                   :floor floor
-                   :time (time/now)}))
+         #(conj % (generate-history-log
+                   (str "Generated room: "  (::db/name room))
+                   (::db/room-index room) floor)))
         (update
          ::db/history
-         #(conj % {:description (str "Generated situation: "
-                                     (::db/name situation))
-                   :room-index (::db/room-index room)
-                   :floor floor
-                   :time (time/now)}))))))
+         #(conj % (generate-history-log
+                   (str "Generated situation: " (::db/name situation))
+                   (::db/room-index room) floor)))))))
+
+(re-frame/reg-event-db
+ ::regenerate-room
+ (fn-traced
+  [{floor ::db/current-floor :as db} [_ coord from-dir]]
+  (let [room-index (get-in db [::db/floors floor ::db/map coord
+                               ::db/room-index])
+        floor-state (-> (db/generate-room (get-in db [::db/floors floor])
+                                          coord from-dir)
+                        (assoc-in [::db/map coord ::db/room-index] room-index))
+        room (-> (get-in floor-state [::db/map coord])
+                 (assoc ::db/room-index room-index))
+        situation (get room ::db/situation)]
+    (-> 
+     (assoc-in db [::db/floors floor] floor-state)
+     (update
+      ::db/history
+      #(conj % (generate-history-log
+                (str "Regenerated room " room-index ": "  (::db/name room))
+                (::db/room-index room) floor)))
+        (update
+         ::db/history
+         #(conj % (generate-history-log
+                   (str "Regenerated situation: " (::db/name situation))
+                   (::db/room-index room) floor)))))))
 
 (re-frame/reg-event-db
  ::show-generate-dialog

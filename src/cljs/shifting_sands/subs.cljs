@@ -95,7 +95,7 @@
 
 (re-frame/reg-sub
  ::history
- (fn [db] (get db ::db/history)))
+ (fn [db] (reverse (get db ::db/history))))
 
 (re-frame/reg-sub
  ::show-history?

@@ -6,6 +6,11 @@ p {
     font-family: 'Montserrat', sans-serif;
 }
 
+.history-panel .rc-modal-panel-container{
+    max-height: 80%;
+    overflow-y: auto;
+}
+
 #history p {
     margin: 0;
 }
@@ -103,6 +108,11 @@ p {
     width: 10em;
     height: auto;
     padding: 5px;
+}
+
+.slug-panel .rc-modal-panel-container{
+    max-height: 80%;
+    overflow-y: auto;
 }
 
 .menu-button {
