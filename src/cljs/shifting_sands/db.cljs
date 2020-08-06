@@ -1792,10 +1792,11 @@
          {::name (get-exit-room-name floor)}))
 
 (defn gen-random-room
-  [floor-state adv]
+  [floor-state adv from-dir]
   (if (= (::exit-index floor-state) (count (::map floor-state)))
     (generate-exit-room floor-state)
-    (generate floor-state [::room (::floor floor-state)] adv)))
+    (-> (generate floor-state [::room (::floor floor-state)] adv)
+        (merge {::from-dir from-dir}))))
 
 (defn add-situation
   "Generate a random situation and add it to the given room if applicable"
@@ -1810,11 +1811,10 @@
    (assoc-in
     floor-state
     [::map coord]
-    (-> (gen-random-room floor-state adv)
+    (-> (gen-random-room floor-state adv from-dir)
         (gen-hallways floor-state coord from-dir)
         (merge {::room-index (count (::map floor-state))})
-        (add-situation floor-state)
-        (merge {::from-dir from-dir})))))
+        (add-situation floor-state)))))
 
 (defn init-floor
   "Initiate a floor in the db for the given level e.g. :pelagic"
