@@ -142,34 +142,39 @@
    :floor floor
    :time (time/now)})
 
+(def adv->str (partial db/adv->str ""))
+
 (re-frame/reg-event-db
  ::generate-room
  (fn-traced
-  [{floor ::db/current-floor :as db} [_ coord from-dir]]
+  [{floor ::db/current-floor adv ::db/room-adv :as db} [_ coord from-dir]]
   (let [floor-state (db/generate-room (get-in db [::db/floors floor])
-                                      coord from-dir)
+                                      coord from-dir adv)
         room (get-in floor-state [::db/map coord])
         situation (get room ::db/situation)]
     (-> (assoc-in db [::db/floors floor] floor-state)
+        (assoc ::db/room-adv 0)
         (update
          ::db/history
          #(conj % (generate-history-log
-                   (str "Generated room: "  (::db/name room))
+                   (str "Generated room" (adv->str adv) ": "  (::db/name room))
                    (::db/room-index room) floor)))
         (update
          ::db/history
          #(conj % (generate-history-log
-                   (str "Generated situation: " (::db/name situation))
+                   (str "Generated situation" (adv->str adv)": "
+                        (::db/name situation))
                    (::db/room-index room) floor)))))))
 
 (re-frame/reg-event-db
  ::regenerate-room
  (fn-traced
   [{floor ::db/current-floor :as db} [_ coord from-dir]]
-  (let [room-index (get-in db [::db/floors floor ::db/map coord
-                               ::db/room-index])
+  (let [prev (get-in db [::db/floors floor ::db/map coord])
+        room-index (get prev ::db/room-index)
+        adv (get prev ::db/adv)
         floor-state (-> (db/generate-room (get-in db [::db/floors floor])
-                                          coord from-dir)
+                                          coord from-dir adv)
                         (assoc-in [::db/map coord ::db/room-index] room-index))
         room (-> (get-in floor-state [::db/map coord])
                  (assoc ::db/room-index room-index))
@@ -179,13 +184,15 @@
      (update
       ::db/history
       #(conj % (generate-history-log
-                (str "Regenerated room " room-index ": "  (::db/name room))
+                (str "Regenerated room " room-index (adv->str adv)": "
+                     (::db/name room))
                 (::db/room-index room) floor)))
-        (update
-         ::db/history
-         #(conj % (generate-history-log
-                   (str "Regenerated situation: " (::db/name situation))
-                   (::db/room-index room) floor)))))))
+     (update
+      ::db/history
+      #(conj % (generate-history-log
+                (str "Regenerated situation" (adv->str adv) ": "
+                     (::db/name situation))
+                (::db/room-index room) floor)))))))
 
 (re-frame/reg-event-db
  ::show-generate-dialog
@@ -209,7 +216,8 @@
         (assoc ::db/generate-result item)
         (update
          ::db/history
-         #(conj % {:description (item->str item)
+         #(conj % {:description (str  "Generate" (adv->str adv) ": "
+                                      (item->str item))
                    :floor floor
                    :time (time/now)}))))))
 
@@ -230,3 +238,10 @@
  (fn-traced
   [db _]
   (dissoc db ::db/show-history?)))
+
+(re-frame/reg-event-db
+ ::update-room-adv
+ (fn-traced
+  [db [_ update-fn]]
+  (update db ::db/room-adv (comp (partial max -3) (partial min 3) update-fn))))
+

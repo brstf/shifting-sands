@@ -41,8 +41,9 @@
 (def floors
   (->> (sort second db/floor->depth)
        (map first)
-       (map (fn [f] {:id f :label (-> (string/upper-case (name f))
-                                      (string/replace #"-" " " ))}))
+       (map (fn [f] {:id f :label (->> (string/split (name f) #"-")
+                                       (map capitalize-first)
+                                       (string/join " "))}))
        (into [])))
 
 (defn floor-header []
@@ -52,7 +53,7 @@
      :model current-floor
      :width "100%"
      :on-change #(re-frame/dispatch [::events/change-floor %])
-     :class "montserrat floor-header"]))
+     :class "mono floor-header"]))
 
 (defn exit-index-label []
   (let [exit-index (re-frame/subscribe [::subs/exit-index])]
@@ -75,22 +76,55 @@
 (defn room-list []
   (let [room-list (re-frame/subscribe [::subs/room-list])]
     [re-com/scroller
+     :style {:flex "1"}
      :child [:ul
              (for [room @room-list]
                ^{:key (::db/room-index room)}
                [:li (room->hiccup room)])]]))
+
+(def adv->str (partial db/adv->str "None"))
+
+(defn room-adv []
+  (let [room-adv (re-frame/subscribe [::subs/room-adv])]
+    [re-com/h-box
+     :class "room-adv-overlay"
+     :children
+     [[:p {:style {:flex "1" :align-self "center"}
+           :class "mono"}
+       "Generate room" [:br] "advantage:"]
+      [re-com/v-box
+       :style {:align-self "center"}
+       :children [[re-com/md-icon-button
+                   :md-icon-name "zmdi-triangle-up"
+                   :size :smaller
+                   :on-click #(re-frame/dispatch
+                               [::events/update-room-adv inc])]
+                  [re-com/md-icon-button
+                   :md-icon-name "zmdi-triangle-down"
+                   :size :smaller
+                   :on-click #(re-frame/dispatch
+                               [::events/update-room-adv dec])]]]
+      [:p
+       {:class "mono"
+        :style {:text-align "center"
+                :align-self "center"
+                :width "60px"}}
+       (adv->str @room-adv)]]]))
 
 (defn sidebar []
   [re-com/v-box
    :children [[floor-header]
               [exit-index-label]
               [re-com/line :color aqua-green]
-              [room-list]]
+              [room-list]
+              [re-com/line :color aqua-green]
+              [room-adv]]
    :class "sidebar"])
 
 (defn explore-button
   [coord dir]
-  [:div [:p {:class (str "explore-qm explore-" (name dir))} "?"]
+  [:div [:p {:class (str "mono unselectable explore-qm explore-" (name dir))}
+         "?"]
    [:div {:class (str "explore-button explore-button-" (name dir))
           :on-click #(re-frame/dispatch
                       [::events/generate-room coord dir])}]])
@@ -145,6 +179,7 @@
     [re-com/popover-anchor-wrapper
      :showing? showing?
      :class "button-container"
+     :style {:pointer-events "auto"}
      :position :left-below
      :anchor [re-com/md-icon-button
               :md-icon-name "zmdi-more-vert"
@@ -168,7 +203,7 @@
   [coord room-map]
   [re-com/v-box
    :class "room cell"
-   :children [[:p {:class "montserrat room-text"
+   :children [[:p {:class "mono room-text unselectable"
                    :style {:align-self "center"
                            :pointer-events "none"}}
                (::db/room-index room-map)]
@@ -276,7 +311,7 @@
             :justify-content "center"
             :flex-direction "row"}
     :on-click #(re-frame/dispatch [::events/show-history])}
-   [:p {:style {:margin "0"}} "Show History"]
+   [:p {:style {:margin "0"}} "History"]
    [re-com/md-icon-button
     :md-icon-name "zmdi-time-restore"
     :disabled? true]])
@@ -433,10 +468,10 @@
        [:table {:id "history"}
         [:thead
          [:tr
-          [:th [:p [:b "Timestamp"]]]
-          [:th [:p [:b "Floor"]]]
-          [:th [:p [:b "Room" [:br] "Index"]]]
-          [:th [:p [:b "Description"]]]]]
+          [:th [:p {:class "header"} [:b "Timestamp"]]]
+          [:th [:p {:class "header"} [:b "Floor"]]]
+          [:th [:p {:class "header"} [:b "Room" [:br] "Index"]]]
+          [:th [:p {:class "header"} [:b "Description"]]]]]
         [:tbody
          (for [[idx {:keys [description room-index floor time]}]
                (map-indexed (comp vec list) @history)]

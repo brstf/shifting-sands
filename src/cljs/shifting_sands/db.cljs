@@ -2,8 +2,13 @@
   (:require [cljs.spec.alpha :as s]
             [clojure.string :as str]))
 
-(defn list->generate-map [coll]
-  (map-indexed (fn [idx item] {::name item ::index #{idx}}) coll))
+(defn list->generate-map
+  ([coll] (list->generate-map coll nil))
+  ([coll gen-fn]
+   (map-indexed
+    (fn [idx item]
+      (merge {::name item ::index #{(inc idx)}}
+             (when gen-fn {::generate-fn gen-fn}))) coll)))
 
 (def spells
   ["Arcane Eye"
@@ -133,6 +138,48 @@
             "Urchin's Spine"
             "Calcium Coral"])
 
+(def general-gear1 ["2x Torch"
+                    "Bear Trap"
+                    "Shovel"
+                    "Bellows"
+                    "Grease"
+                    "Saw"
+                    "Bucket"
+                    "Caltrops"
+                    "Chisel"
+                    "Drill"
+                    "Fishing Rod"
+                    "Marbles"
+                    "Glue"
+                    "Pick"
+                    "Hourglass"
+                    "Net"
+                    "Tongs"
+                    "Lockpick"
+                    "Metal file"
+                    "{{melee-weapon}}"])
+
+(def general-gear2 ["2x Torch"
+                    "Sponge"
+                    "Lens"
+                    "Perfume"
+                    "Horn"
+                    "Bottle"
+                    "Soap"
+                    "Spyglass"
+                    "Tar Pot"
+                    "Twine"
+                    "Fake Jewels"
+                    "Card Deck"
+                    "Dice Set"
+                    "Face Paint"
+                    "Whistle"
+                    "Instrument"
+                    "Quill & Ink"
+                    "Small Bell"
+                    "Airbladder"
+                    "{{ranged-weapon}}"])
+
 (def universal-rooms
   {::the-plunge
    {
@@ -185,15 +232,20 @@
     [
      {
       ::name "Hanging Gardens"
+      ::description (str "{{1d4[+]}} Hermits are selling\n- 250s {{slug}}\n"
+                         "- 250s {{slug}}\n- 250s {{slug}}\n")
       ::num-hallways 2
       ::danger -2
       ::index #{1}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Open Water"
+      ::description "{{open-water-pelagic}}"
       ::num-hallways 4
       ::danger 0
       ::index #{2}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "The Currents"
@@ -203,9 +255,11 @@
       }
      {
       ::name "Sinking Ship"
+      ::description "Trap - {{trap}}\nInside the ship: {{sinking-ship}}"
       ::num-hallways 2
       ::danger 0
       ::index #{4}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Whirlpool Well"
@@ -215,45 +269,72 @@
       }
      {
       ::name "Seagrass Plains"
+      ::description (str "{{1d4:1 the Chest is a Mimic Fish!;2-4:The "
+                         "chest contains treasure!}}")
       ::num-hallways 4
       ::danger 1
       ::index #{6}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Spawning Pool"
+      ::description (str "{{1d4[-]:1:A Chum;2:3 Chum;3:3 Chum and a Chum "
+                         "Guard with {{armor}};4:4 Chum, a Chum Guard "
+                         "with {{armor}} and another with {{armor}} "
+                         "and a Chum Priest with {{spell}}}}")
       ::num-hallways 2
       ::danger 0
       ::index #{7}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Driftwood Pile"
+      ::description (str "What's in the Pile?\n{{1d8:1:A Wandering Hermit "
+                         "Merchant:{{shop}};2:2 Chum;3:3 Glaucimmian;"
+                         "4:4 Gulltures;5:6 Chum;6:An Eelaconda;"
+                         "7:8 Chum;8:A Scale Stalker}}")
       ::num-hallways 1
       ::danger 1
       ::index #{8}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Gullture Eerie"
+      ::description "Trap - {{trap}}"
       ::num-hallways 3
       ::danger 1
       ::index #{9}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Chum Nest"
+      ::description (str "Trap - {{trap}}\nChum that live here:{{1d4:"
+                         "1:3 Chum;2:5 Chum;3:4 Chum and a Chum Guard with "
+                         "{{armor}};4:4 Chum, a Chum Guard with {{armor}} "
+                         "and another with {{armor}} and a Chum Priest "
+                         "with {{spell}}}}")
+      
       ::num-hallways 3
       ::danger -1
       ::index #{10}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Upside Down"
+      ::description (str "Trap - {{trap}}\nHidden slugs:\n- {{slug}}\n"
+                         "- {{slug}}\n- {{slug}}\n- {{slug}}")
       ::num-hallways 3
       ::danger 1
       ::index #{11}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "The Shelf"
+      ::description "{{twilight-encounter}}"
       ::num-hallways 3
       ::danger 2
       ::index #{12}
+      ::generate-fn ::fill-str-templates
       }
      ]
     ::the-reef
@@ -266,9 +347,11 @@
       }
      {
       ::name "Thicket"
+      ::description "Trap - {{trap}}\nThere's also one Reef Golem here"
       ::num-hallways 4
       ::danger 0
       ::index #{2}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "The Speaker"
@@ -283,23 +366,34 @@
       ::index #{4}
       }
      {
-      ::name "A-mana-me Garden"
+      ::name "A-Mana-Me Garden"
       ::num-hallways 1
       ::danger -1
       ::index #{5}
       }
      {
       ::name "Coral Maze"
+      ::description (str
+                     "Trap - {{trap}}. Size of Halls: {{1d6:"
+                     "1:Open - The Heirs can pass through easily;"
+                     "2:Tight - Two by two only;"
+                     "3:Low - Heirs must bend over and move at half speed;"
+                     "4:Fat man's squeeze - Single file;"
+                     "5:Stifling - It's dark, no light;"
+                     "6:Time to crawl - Heirs must crawl, quarter speed}}")
       ::num-hallways "{{1d4}}"
       ::danger 0
       ::index #{6 7 8 9}
-      ::generate-fn ::fill-var-hallways
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Spinney"
+      ::description (str "Type of coral: {{1d4:1:Pike Coral;2:Fire Coral;"
+                         "3:Urchin's Spine;4:Calcium Coral}}")
       ::num-hallways 3
       ::danger 1
       ::index #{10 11}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Lagoon Arena"
@@ -311,15 +405,22 @@
     [
      {
       ::name "Weed Mat"
+      ::description (str "{{1d8:1-4:There are signs of dotters living here, "
+                         "but none are present, they must be roaming "
+                         "elsewhere on the floor;5-8:{{n}} dotters here! "
+                         "They are cautious but curious}}")
       ::num-hallways 4
       ::danger -1
       ::index #{1}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Salty Orchard"
+      ::description "Herd of {{1d8}} Sea Cows\n{{1d6}} Glaucimmian"
       ::num-hallways 3
       ::danger 0
       ::index #{2}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "The Weeper"
@@ -333,7 +434,6 @@
       ::num-hallways "{{1d4}}"
       ::danger 1
       ::index #{4 5 6}
-      ::generate-fn ::fill-var-hallways
       }
      {
       ::name "Tangleweed Thicket"
@@ -343,9 +443,14 @@
       }
      {
       ::name "Chum Nest"
+      ::description (str "{{1d4:1:8 Chum;2:12 Chum;3:10 Chum, a Chum Guard "
+                         "with {{armor}}, and another with {{armor}};4:12 "
+                         "Chum, a Chum Guard with {{armor}}, another with "
+                         "{{armor}}, and a Chum Priest with {{spell}}}}")
       ::num-hallways 3
       ::danger 0
       ::index #{9}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Urchin Barren"
@@ -380,21 +485,45 @@
       }
      {
       ::name "Open Water"
+      ::description (str "Floating in the channels: {{1d6:1:4 Chum float "
+                         "through, they are completely lost;2:A sack of "
+                         "Loot floats past with:\n- {{loot}}\n- {{loot}}"
+                         "\n- {{loot}};3-4:Someone sent the dead's sand "
+                         "down. Gain 1000 sand;5:A dead Chum floating on "
+                         "its back, it's holding an onyx figurine. The "
+                         "figurine acts as a Spellpearl with {{spell}} "
+                         "and {{spell}};6:2 Electric Eelaconda enter}}")
       ::num-hallways 4
       ::danger 1
       ::index #{3 4}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Spawning Pool"
+      ::description (str "Distracted Chum: {{1d4:1:4 Chum and 2 Balloon "
+                         "Chum;2:6 Tropical Chum;3:6 Chumacuda;4:4 Deep "
+                         "Chum}}")
       ::num-hallways 2
       ::danger 1
       ::index #{5 6}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Chum Town"
+      ::description (str "{{1d6:1:10 Chum;2:8 Chum and a Chum Priest with "
+                         "{{spell}};3:6 Chum and an Eelaconda;4:12 Chum, "
+                         "a Chum Priest with {{spell}}, and another with "
+                         "{{spell}};5:6 Chum Priests are chanting, more "
+                         "Chum watch curiously from the channels in the "
+                         "walls. The priests have {{spell}}, {{spell}}, "
+                         "{{spell}}, {{spell}}, {{spell}}, and {{spell}};"
+                         "6:A Deep Chum champion (wearing coral plate and "
+                         "wielding a random treasure) riding a Hammerhead "
+                         "Stalker}}")
       ::num-hallways 4
       ::danger 0
       ::index #{7 8}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Whirlpool Well"
@@ -441,9 +570,13 @@
       }
      {
       ::name "Dolpod Temple"
+      ::description (str "{{1d4:1:4 Dolpods;2:6 Dolpods;3:8 Dolpods;"
+                         "4:A Dolpod Hive (Dolpod with 2x HP and screeches "
+                         "that deal 1d8 Psychic Damage}}")
       ::num-hallways 2
       ::danger -2
       ::index #{9}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::name "Worm Hedge"
@@ -1367,13 +1500,48 @@
                     ::slot 3
                     ::quality 5}
      }]
+   ::open-water-pelagic
+   [{::index #{1}
+     ::description "3 Chum float through"}
+    {::index #{2}
+     ::description (str "A sack of Loot floats past. It contains:\n"
+                        "- {{loot}}\n- {{loot}}\n-{{loot}}")}
+    {::index #{3 4}
+     ::description "Someone sent the dead's Sand down. Gain 500 sand"}
+    {::index #{5}
+     ::description (str "A wooden figurine. This figurine functions as "
+                        "a spellpearl with {{spell}}")}
+    {::index #{6}
+     ::description "An Eelaconda enters."}]
+   ::sinking-ship
+   [{::index #{1}
+     ::description "A chest of loot! It contains\n- {{loot}}\n- {{loot}}"
+     ::generate-fn ::fill-str-templates}
+    {::index #{2}
+     ::description "A dead sailor is found. If searched:\n{{loot}}"
+     ::generate-fn ::fill-str-templates}
+    {::index #{3}
+     ::description (str "A hermit has set up shop:\n{{gear1-shop}}\n"
+                        "{{gear1-shop}}\n{{gear2-shop}}\n"
+                        "{{gear2-shop}}\n{{dungear-shop}}\n"
+                        "{{dungear-shop}}")
+     ::generate-fn ::fill-str-templates}
+    {::index #{4}
+     ::description (str "There is a noticeable lack of metal on-board. "
+                        "Hiding in the hold, chewing on bolts is a Steel "
+                        "Beak")}
+    {::index #{5}
+     ::description (str "The Heirs find 2 Dolpod Cultists worshipping at "
+                        "a desecrated temple to the Deep Queen")}
+    {::index #{6}
+     ::description "The ship is covered in Plague Urchins"}]
+   ::general-gear1 (list->generate-map general-gear1 ::fill-name-templates)
+   ::general-gear2 (list->generate-map general-gear2 ::fill-name-templates)
    ::spell (list->generate-map spells)
    ::slug-color (list->generate-map slug-colors)
    ::slug-effect (list->generate-map slug-effects)
    ::coral (list->generate-map coral)
    })
-
-
 
 (defn get-table-names
   ([] (get-table-names tables []))
@@ -1437,6 +1605,14 @@
 
 (defn abs [n] (max n (- n)))
 
+(defn adv->str
+  "Convert an advantage/disadvantage number to display string e.g. [+]"
+  [none-text adv]
+  (if (= 0 adv)
+    none-text
+    (let [c (if (< 0 adv) \+ \-)]
+      (str \[ (apply str (repeat (abs adv) c)) \]))))
+
 (defn str->int [s]
   (js/parseInt s))
 
@@ -1454,11 +1630,42 @@
   (roll (str->int num) (str->int faces)
         (* (case (first adv) \+ 1 \- -1 1) (count adv))))
 
+;; {{1d4[-]:1:a Chum;2:3 Chum;3:3 Chum and a Chum Guard;
+;; 4:4 Chum, 2 Chum Guards and a Chum Priest with {{spell}};
 (defn fill-die-roll-template
   "Replace all instances of {{XdY}} in the string with a roll of the dice
    Note the brackets, dice outside of brackets will not be modified"
   [s]
   (str/replace s #"\{\{(\d+)d(\d+)(\[(\++|-+)\])?\}\}" match->roll))
+
+(def choice-pattern #"(\d+)(-(\d+))?:((?:.|\n)*)")
+(def roll-choice-pattern #"\{\{(\d+)d(\d+)(\[(\++|-+)\])?:((?:.|\n)*)\}\}")
+
+(defn choice->map [s]
+  (let [[_ start _ end choice] (re-find choice-pattern s)
+        nums (if end
+               (range (str->int start) (inc (str->int end)))
+               [(str->int start)])]
+    (->> (interleave nums (repeat choice))
+         (partition 2)
+         (map vec)
+         (into {}))))
+
+(defn choices->map [s]
+  (->> (str/split s #";")
+       (map choice->map)
+       (reduce merge)))
+
+(defn match->choice
+  [[_ num faces _ adv choice-text]]
+  (let [r (roll (str->int num) (str->int faces)
+                (* (case (first adv) \+ 1 \- -1 1) (count adv)))
+        choice-map (choices->map choice-text)]
+    (str/replace (get choice-map r) #"\{\{n\}\}" (str r))))
+
+(defn fill-die-roll-choice-template
+  [fs s]
+  (str/replace s roll-choice-pattern match->choice))
 
 (defn max-index [templates]
   (->> (map ::index templates)
@@ -1642,6 +1849,10 @@
   (str/replace s #"\{\{melee-weapon\}\}"
                #(weapon->str (generate fs [::melee-weapon]))))
 
+(defn fill-ranged-weapon [fs s]
+  (str/replace s #"\{\{ranged-weapon\}\}"
+               #(weapon->str (generate fs [::ranged-weapon]))))
+
 (defn fill-used-ranged-weapon [fs s]
   (let [rw (generate fs [::ranged-weapon])
         used-rw (update-in rw [::description ::quality] dec)]
@@ -1661,13 +1872,21 @@
         magic-mw (update-in mw [::description ::name] #(str % "[+]"))]
     (str/replace s #"\{\{magic-melee-weapon\}\}" (weapon->str magic-mw))))
 
+(defn fill-armor [fs s]
+  (str/replace s #"\{\{armor\}\}" (armor->str (generate fs [::armor]))))
+
 (defn fill-used-armor [fs s]
   (let [armor (generate fs [::armor])
         used-armor (update-in armor [::description ::quality] dec)]
-    (str/replace s #"\{\{used-armor\}\}" (armor->str used-armor))))
+    (str/replace s #"\{\{used-armor\}\}"
+                 (-> (generate fs [::armor])
+                     (update-in [::description ::quality] dec)
+                     armor->str))))
 
 (defn fill-var-hallways [fs t]
-  (update t ::num-hallways #(str->int (fill-die-roll-template %))))
+  (if (string? (::num-hallways t))
+    (update t ::num-hallways #(str->int (fill-die-roll-template %)))
+    t))
 
 (defn generate-loot
   "Generate a piece of loot for the given floor"
@@ -1704,6 +1923,10 @@
                  (->> (generate fs [::encounter floor] (str->adv adv-str))
                       ::description))))
 
+(defn fill-twilight-encounter [fs s]
+  (str/replace s #"\{\{twilight-encounter\}\}"
+               (::description (generate fs [::encounter ::the-twilight]))))
+
 (defn fill-depth-dice [{floor ::floor} s]
   (str/replace s #"\{\{depthd(\d+)\}\}"
                (fn [[_ faces-str]]
@@ -1729,28 +1952,71 @@
   (str/replace s #"\{\{deep-pool-attribute\}\}"
                #(::description (generate fs [::deep-pool-attribute]))))
 
+(defn fill-open-water-pelagic [fs s]
+  (str/replace s #"\{\{open-water-pelagic\}\}"
+               #(::description (generate fs [::open-water-pelagic]))))
+
+(defn fill-trap [{floor ::floor :as fs} s]
+  (str/replace s #"\{\{trap\}\}"
+               #(::name (generate fs [::trap floor]))))
+
+(defn fill-sinking-ship [fs s]
+  (str/replace s #"\{\{sinking-ship\}\}"
+               #(::description (generate fs [::sinking-ship]))))
+
+(defn generate-gear-shop-item [fs gear]
+  (let [item (generate fs [gear])
+        price (* (::roll item) 50)]
+    (assoc item ::price price)))
+
+(defn shop-gear->str [{price ::price name ::name}]
+  (str price "s - " name))
+
+(defn fill-gear-shop [gear template fs s]
+  (str/replace
+   s
+   template
+   #(shop-gear->str (generate-gear-shop-item fs gear))))
+
+(def fill-gear1-shop
+  (partial fill-gear-shop ::general-gear1 #"\{\{gear1-shop\}\}"))
+(def fill-gear2-shop
+  (partial fill-gear-shop ::general-gear2 #"\{\{gear2-shop\}\}"))
+(def fill-dungear-shop
+  (partial fill-gear-shop ::dungeoneering-gear #"\{\{dungear-shop\}\}"))
+
 (defn fill-str-templates
   "Fill all templates of the form {{command}}"
   ([fs t] (fill-str-templates fs t ::description))
   ([fs t k]
-   (-> (update t k fill-die-roll-template)
+   (-> (update t k (partial fill-die-roll-choice-template fs))
+       (update k fill-die-roll-template)
        (update k fill-slug-template)
        (update k fill-spell-template fs)
        (update k (partial fill-loot-template fs))
        (update k (partial fill-melee-weapon fs))
+       (update k (partial fill-ranged-weapon fs))
        (update k (partial fill-used-ranged-weapon fs))
        (update k (partial fill-rusty-melee-weapon fs))
        (update k (partial fill-dungeoneering-gear fs))
        (update k (partial fill-magic-melee-weapon fs))
+       (update k (partial fill-armor fs))
        (update k (partial fill-used-armor fs))
        (update k (partial fill-shop-item fs))
        (update k (partial fill-depth-dice fs))
        (update k (partial fill-encounter fs))
+       (update k (partial fill-twilight-encounter fs))
        (update k (partial fill-situation-loot fs))
        (update k (partial fill-shop-inventory fs))
        (update k (partial fill-god-template fs))
        (update k (partial fill-rogue-wave-contents fs))
-       (update k (partial fill-deep-pool-attribute fs)))))
+       (update k (partial fill-deep-pool-attribute fs))
+       (update k (partial fill-open-water-pelagic fs))
+       (update k (partial fill-trap fs))
+       (update k (partial fill-sinking-ship fs))
+       (update k (partial fill-gear1-shop fs))
+       (update k (partial fill-gear2-shop fs))
+       (update k (partial fill-dungear-shop fs)))))
 
 (defn generate-exotic-weapon
   "generation-fn for an exotic weapon. Generates a new non-exotic weapon,
@@ -1770,15 +2036,14 @@
          (add-weapon-price fs))))
 
 (defn fill-templates [fs t]
-  (dissoc
-   (case (::generate-fn t)
-     ::fill-str-templates (fill-str-templates fs t)
-     ::fill-name-templates (fill-str-templates fs t ::name)
-     ::fill-var-hallways (fill-var-hallways fs t)
-     ::generate-exotic-weapon (generate-exotic-weapon fs t)
-     ::add-weapon-price (add-weapon-price fs t)
-     t)
-   ::generate-fn))
+  (-> (case (::generate-fn t)
+        ::fill-str-templates (fill-str-templates fs t)
+        ::fill-name-templates (fill-str-templates fs t ::name)
+        ::generate-exotic-weapon (generate-exotic-weapon fs t)
+        ::add-weapon-price (add-weapon-price fs t)
+        t)
+      ((partial fill-var-hallways fs))
+      (dissoc ::generate-fn)))
 
 (defn get-exit-room-name [floor]
   (if (#{::the-trench} floor)
@@ -1796,14 +2061,14 @@
   (if (= (::exit-index floor-state) (count (::map floor-state)))
     (generate-exit-room floor-state)
     (-> (generate floor-state [::room (::floor floor-state)] adv)
-        (merge {::from-dir from-dir}))))
+        (merge {::from-dir from-dir ::adv adv}))))
 
 (defn add-situation
   "Generate a random situation and add it to the given room if applicable"
-  [room floor-state]
+  [room floor-state adv]
   (if (#{::exit} (::id room))
     room
-    (merge room {::situation (generate floor-state [::situation])})))
+    (merge room {::situation (generate floor-state [::situation] adv)})))
 
 (defn generate-room
   ([floor-state coord from-dir] (generate-room floor-state coord from-dir 0))
@@ -1814,7 +2079,7 @@
     (-> (gen-random-room floor-state adv from-dir)
         (gen-hallways floor-state coord from-dir)
         (merge {::room-index (count (::map floor-state))})
-        (add-situation floor-state)))))
+        (add-situation floor-state adv)))))
 
 (defn init-floor
   "Initiate a floor in the db for the given level e.g. :pelagic"
@@ -1838,7 +2103,8 @@
    (merge (-> db
               (assoc ::current-floor ::pelagic)
               (assoc ::floors (init-floors))
-              (assoc ::history []))
+              (assoc ::history [])
+              (assoc ::room-adv 0))
           (if reset-slugs? {::slugs (generate-slug-map)}))))
 
 (def default-db (init-db  {:name "shifting-sands"}))

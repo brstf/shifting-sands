@@ -100,3 +100,7 @@
 (re-frame/reg-sub
  ::show-history?
  (fn [db] (get db ::db/show-history?)))
+
+(re-frame/reg-sub
+ ::room-adv
+ (fn [db] (get db ::db/room-adv)))

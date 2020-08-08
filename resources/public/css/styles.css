@@ -6,6 +6,30 @@ p {
     font-family: 'Montserrat', sans-serif;
 }
 
+.unselectable {
+    /* https://stackoverflow.com/questions/6900124/how-to-make-certain-text-not-selectable-with-css */
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */    
+}
+
+.mono {
+    font-family: 'Major Mono Display', monospace;
+}
+
+/*.button-container div {
+    font-family: 'Major Mono Display', monospace;
+}
+
+.button-container p {
+    font-family: 'Major Mono Display', monospace;
+}*/
+
+svg {
+    pointer-events: none;
+}
+
 .history-panel .rc-modal-panel-container{
     max-height: 80%;
     overflow-y: auto;
@@ -39,6 +63,10 @@ p {
     word-wrap: break-word;
 }
 
+#history .header {
+    font-family: 'Major Mono Display', monospace;
+}
+
 .modal-result {
     font-size: 22px;
     max-width: 700px;
@@ -63,6 +91,10 @@ p {
     padding-bottom: 10px;
 }
 
+.floor-header li {
+    font-family: 'Major Mono Display', monospace;
+}
+
 .generate-dropdown {
     font-size: 16px;
 }
@@ -80,6 +112,15 @@ p {
     padding: 8px;
 }
 
+.room-adv-overlay {
+    align-content: center;
+    padding-top: 8px;
+}
+
+.room-adv-overlay p {
+    margin: 0;
+}
+
 .slug-row {
     font-family: 'Montserrat', sans-serif;
     font-size: 20px;
@@ -88,6 +129,8 @@ p {
 
 .slug-header {
     background-color: #679781;
+    font-family: 'Major Mono Display', monospace;
+    color: #FFFFFF;
 }
 
 .slug-row-even {
@@ -136,6 +179,7 @@ p {
 .button {
     background: #679781;
     color: #FFFFFF;
+    font-family: 'Major Mono Display', monospace;
 }
 
 .button:hover {
@@ -146,6 +190,7 @@ p {
     width: 160px;
     height: 160px;
     position: relative;
+    pointer-events: none;
 }
 
 .cell {
@@ -272,20 +317,20 @@ li {
 }
 
 .explore-west {
-    left: 15px;
+    left: 10px;
     top: 50%;
     transform: translate(0,-50%);
 }
 
 .explore-east {
-    right: 15px;
+    right: 10px;
     top: 50%;
     transform: translate(0,-50%);
 }
 
 .explore-qm {
     position: absolute;
-    font-size: 2.5em;
+    font-size: 25px;
     text-align: center;
 }
 
@@ -294,3 +339,5 @@ li {
     top: 0px;
     right: 0px;
 }
+
+
