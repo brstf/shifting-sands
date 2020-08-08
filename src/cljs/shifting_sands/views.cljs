@@ -60,12 +60,17 @@
     [:p {:class "exit-index"} [:b (str "Exit Index: " @exit-index)]]))
 
 (defn room->hiccup
-  [{ri ::db/room-index n ::db/name s ::db/situation r ::db/roll}]
+  [{ri ::db/room-index n ::db/name d ::db/description
+    s ::db/situation r ::db/roll}]
   [:div
    [:p {:style {:display "inline"}} [:b (str ri ". ")]
-    (str (if (nil? s) "" (str "(" r "/" (::db/roll s) ") "))
-         n
-         (if (nil? s) "" (str " + " (::db/name s))))]
+    (str (if (nil? s) "" (str "(" r "/" (::db/roll s) ") ")) n)
+    (when d [re-com/info-button
+             :info [:span (text->hiccup d)]
+             :style {:display "inline"}
+             :position :right-below
+             :width "250px"])     
+    (if (nil? s) "" (str " + " (::db/name s)))]
    (when (::db/description s)
      [re-com/info-button
       :info [:span (text->hiccup (::db/description s))]
