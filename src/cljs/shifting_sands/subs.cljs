@@ -14,6 +14,11 @@
    (::db/current-floor db)))
 
 (re-frame/reg-sub
+ ::notes
+ (fn [{floor ::db/current-floor :as db} [_ coord]]
+   (get-in db [::db/floors floor ::db/map coord ::db/notes] "")))
+
+(re-frame/reg-sub
  ::exit-index
  (fn [db]
    (get-in db [::db/floors (::db/current-floor db) ::db/exit-index])))
@@ -104,3 +109,15 @@
 (re-frame/reg-sub
  ::room-adv
  (fn [db] (get db ::db/room-adv)))
+
+(re-frame/reg-sub
+ ::showing-coord
+ (fn [db _] (get db ::db/showing-coord)))
+
+(re-frame/reg-sub
+ ::expanded-notes?
+ (fn [db _] (get db ::db/expanded-notes?)))
+
+(re-frame/reg-sub
+ ::current-room
+ (fn [db _] (get db ::db/current-room)))

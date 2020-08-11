@@ -8,7 +8,9 @@
    [shifting-sands.subs :as subs]
    [shifting-sands.db :as db]
    [cljs-time.core :as time]
-   [cljs-time.format :as time-format])
+   [cljs-time.format :as time-format]
+   [goog.string :as gstring]
+   [goog.string.format])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 (def aqua-green "#84c7a8")
@@ -64,12 +66,13 @@
     s ::db/situation r ::db/roll}]
   [:div
    [:p {:style {:display "inline"}} [:b (str ri ". ")]
-    (str (if (nil? s) "" (str "(" r "/" (::db/roll s) ") ")) n)
-    (when d [re-com/info-button
-             :info [:span (text->hiccup d)]
-             :style {:display "inline"}
-             :position :right-below
-             :width "250px"])     
+    (str (if (nil? s) "" (str "(" r "/" (::db/roll s) ") ")) n)]
+   (when d [re-com/info-button
+            :info [:span (text->hiccup d)]
+            :style {:display "inline"}
+            :position :right-below
+            :width "250px"])     
+   [:p {:style {:display "inline"}}
     (if (nil? s) "" (str " + " (::db/name s)))]
    (when (::db/description s)
      [re-com/info-button
@@ -179,20 +182,61 @@
          :on-click #(re-frame/dispatch [::events/force-shrine coord])}
    "Force Shrine"])
 
+(defn expandable [label component]
+  (let [expanded? (re-frame/subscribe [::subs/expanded-notes?])]
+    [re-com/v-box
+     :width "100%"
+     :children
+     [[:div {:class "menu-button"
+             :on-click #(re-frame/dispatch [::events/toggle-expanded-notes])
+             :style {:display "flex"
+                     :align-items "center"
+                     :justify-content "center"
+                     :flex-direction "row"}}
+       [:p {:style {:align-self "center" :margin "0"}} label]
+       [re-com/md-icon-button
+        :style {:align-self "center"}
+        :size :larger
+        :md-icon-name (if @expanded?
+                        "zmdi-chevron-down"
+                        "zmdi-chevron-right")
+        :disabled? true]]
+      [re-com/box
+       :class "collapsible"
+       :width "100%"
+       :style {:display (if @expanded? "block" "none")}
+       :child component]]]))
+
+(defn room-notes [coord]
+  (let [notes (re-frame/subscribe [::subs/notes coord])]
+    [expandable "Room Notes"
+     [re-com/input-textarea
+      :class "montserrat"
+      :style {:resize "none"
+              :width "100%"
+              :height "100px"
+              :font-weight "bold"}
+      :model notes
+      :on-change #(re-frame/dispatch [::events/update-notes coord %])
+      :change-on-blur? true]]))
+
 (defn room-menu [coord room-map]
-  (let [showing? (reagent/atom false)]
+  (let [showing-coord (re-frame/subscribe [::subs/showing-coord])
+        showing? (reaction (= coord @showing-coord))]
     [re-com/popover-anchor-wrapper
      :showing? showing?
-     :class "button-container"
+     :class "button-container unselectable"
      :style {:pointer-events "auto"}
      :position :left-below
      :anchor [re-com/md-icon-button
               :md-icon-name "zmdi-more-vert"
-              :on-click #(swap! showing? not)
+              :on-click #(if @showing?
+                           (re-frame/dispatch [::events/hide-room-menu])
+                           (re-frame/dispatch [::events/show-room-menu coord]))
               :class "room-menu"
               :size :smaller]
      :popover [re-com/popover-content-wrapper
-               :on-cancel #(swap! showing? not)
+               :on-cancel #(re-frame/dispatch [::events/hide-room-menu])
                :no-clip? true
                :body [re-com/v-box
                       :children [(when (::db/from-dir room-map)
@@ -201,18 +245,30 @@
                                  [encounter-button coord room-map]
                                  [force-shop-button coord]
                                  [force-shrine-button coord]
+                                 [room-notes coord]
                                  [rotate-button coord ::db/cw]
                                  [rotate-button coord ::db/ccw]]]]]))
 
 (defn room-cell
   [coord room-map]
-  [re-com/v-box
-   :class "room cell"
-   :children [[:p {:class "mono room-text unselectable"
-                   :style {:align-self "center"
-                           :pointer-events "none"}}
-               (::db/room-index room-map)]
-              [room-menu coord room-map]]])
+  (let [current-floor (re-frame/subscribe [::subs/current-floor])
+        current-room (re-frame/subscribe [::subs/current-room])]
+    [re-com/v-box
+     :class "room cell"
+     :children [[:p {:class "mono room-text unselectable"
+                     :style {:align-self "center"
+                             :pointer-events "auto"
+                             :font-size
+                             (if (> 10 (::db/room-index room-map))
+                               "30px" "25px")}
+                     :on-click #(re-frame/dispatch
+                                 [::events/current-room @current-floor coord])}
+                 (gstring/format
+                  (if (and (= coord (::db/coord @current-room))
+                           (= @current-floor (::db/floor @current-room)))
+                    "[%d]" "%d")
+                  (::db/room-index room-map))]
+                [room-menu coord room-map]]]))
 
 (defn hallway
   [dir secret?]

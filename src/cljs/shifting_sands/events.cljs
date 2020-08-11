@@ -245,3 +245,39 @@
   [db [_ update-fn]]
   (update db ::db/room-adv (comp (partial max -3) (partial min 3) update-fn))))
 
+(re-frame/reg-event-db
+ ::update-notes
+ (fn-traced
+  [{floor ::db/current-floor :as db} [_ coord notes]]
+  (assoc-in db [::db/floors floor ::db/map coord ::db/notes] notes)))
+
+(re-frame/reg-event-db
+ ::show-room-menu
+ (fn-traced
+  [db [_ coord]]
+  (assoc db ::db/showing-coord coord)))
+
+(re-frame/reg-event-db
+ ::hide-room-menu
+ (fn-traced
+  [db _]
+  (-> (dissoc db ::db/showing-coord)
+      (dissoc db ::db/expanded-notes?))))
+
+(re-frame/reg-event-db
+ ::toggle-expanded-notes
+ (fn-traced
+  [db _]
+  (update db ::db/expanded-notes? not)))
+
+(re-frame/reg-event-db
+ ::hide-expanded-notes
+ (fn-traced
+  [db _]
+  (dissoc db ::db/expanded-notes?)))
+
+(re-frame/reg-event-db
+ ::current-room
+ (fn-traced
+  [db [_ floor coord]]
+  (assoc db ::db/current-room {::db/floor floor ::db/coord coord})))

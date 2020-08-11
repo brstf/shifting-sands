@@ -180,6 +180,8 @@
                     "Airbladder"
                     "{{ranged-weapon}}"])
 
+(def a-mana-me ["Fire" "Water" "Electric" "Poison"])
+
 (def universal-rooms
   {::the-plunge
    {
@@ -269,7 +271,7 @@
       }
      {
       ::name "Seagrass Plains"
-      ::description (str "{{1d4:1 the Chest is a Mimic Fish!;2-4:The "
+      ::description (str "{{1d4:1:The Chest is a Mimic Fish!;2-4:The "
                          "chest contains treasure!}}")
       ::num-hallways 4
       ::danger 1
@@ -1537,6 +1539,7 @@
      ::description "The ship is covered in Plague Urchins"}]
    ::general-gear1 (list->generate-map general-gear1 ::fill-name-templates)
    ::general-gear2 (list->generate-map general-gear2 ::fill-name-templates)
+   ::a-mana-me (list->generate-map a-mana-me)
    ::spell (list->generate-map spells)
    ::slug-color (list->generate-map slug-colors)
    ::slug-effect (list->generate-map slug-effects)
@@ -1661,6 +1664,7 @@
   (let [r (roll (str->int num) (str->int faces)
                 (* (case (first adv) \+ 1 \- -1 1) (count adv)))
         choice-map (choices->map choice-text)]
+    (print choice-map roll)
     (str/replace (get choice-map r) #"\{\{n\}\}" (str r))))
 
 (defn fill-die-roll-choice-template
@@ -2104,7 +2108,9 @@
               (assoc ::current-floor ::pelagic)
               (assoc ::floors (init-floors))
               (assoc ::history [])
-              (assoc ::room-adv 0))
+              (assoc ::room-adv 0)
+              (assoc ::current-room {::floor ::pelagic
+                                     ::coord [0 0]}))
           (if reset-slugs? {::slugs (generate-slug-map)}))))
 
 (def default-db (init-db  {:name "shifting-sands"}))
