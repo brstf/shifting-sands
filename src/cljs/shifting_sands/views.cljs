@@ -405,18 +405,14 @@
 (defn right-panel []
   [re-com/box
    :size "auto"
-   :child [re-com/scroller
-           :h-scroll :auto
-           :v-scroll :auto
-           :style {:height "100%"
-                   :width "100%"}
-           ;; :style {:flex "1 0 auto"}
-           :scroll :on
-           :child [re-com/h-box
-                   :justify :center
-                   :class "main-panel"
-                   :children [[map-panel]
-                              [button-overlay]]]]])
+   :style {:height "auto"
+           :width "100%"
+           :overflow "auto"}
+   :child [re-com/h-box
+           :justify :center
+           :class "main-panel"
+           :children [[map-panel]
+                      [button-overlay]]]])
 
 (def generate-options
   (->> (db/get-table-names)
@@ -553,6 +549,7 @@
         advantage-choice (reagent/atom 3)]
     [re-com/v-box
      :height "100%"
+     :style {:overflow "hidden"}
      :children
      [[re-com/h-box
        :height "100%"

@@ -100,9 +100,8 @@ svg {
 }
 
 .main-panel {
-    overflow: hidden;
     padding-top: 10px;
-    height: 100%;
+    height: auto;
 }
 
 .button-container {
@@ -189,6 +188,7 @@ svg {
 .tile {
     width: 160px;
     height: 160px;
+    min-height: 160px;
     position: relative;
     pointer-events: none;
 }
