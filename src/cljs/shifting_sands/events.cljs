@@ -10,6 +10,17 @@
   (let [floor (::db/current-floor db)]
     (get-in db [::db/floors floor ::db/map coord ::db/room-index])))
 
+(re-frame/reg-event-fx
+ ::set-active-page
+ (fn-traced
+  [{:keys [db]} [_ {:keys [page]}]]
+  (let [set-page (assoc db ::db/active-page page)]
+    (case page
+      :home {:db set-page}
+      :new-character {:db set-page
+                      :dispatch [::generate-new-character]}
+      :not-found {:db set-page}))))
+
 (re-frame/reg-event-db
  ::initialize-db
  (fn-traced [_ _]
@@ -281,3 +292,9 @@
  (fn-traced
   [db [_ floor coord]]
   (assoc db ::db/current-room {::db/floor floor ::db/coord coord})))
+
+(re-frame/reg-event-db
+ ::generate-new-character
+ (fn-traced
+  [db _]
+  (assoc db ::db/new-character (db/generate-new-character))))

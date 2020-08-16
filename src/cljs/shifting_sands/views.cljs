@@ -341,7 +341,7 @@
 (defn slug-row [idx [color effect]]
   [re-com/h-box
    :class (str "slug-row "
-               (if (= (mod idx 2) 1) "slug-row-odd" "slug-row-even"))
+               (if (even? idx) "slug-row-even" "slug-row-odd"))
    :children [[:span {:class "slug-left"} color]
               [re-com/line :size "2px" :color aqua-green]
               [:span {:class "slug-right"} effect]]])
@@ -542,7 +542,7 @@
                         [:td {:class "description"}
                          (text->hiccup description)]])]]])))
 
-(defn main-panel []
+(defn shifting-sands-panel []
   (let [modal-result (re-frame/subscribe [::subs/modal-result])
         show-generate? (re-frame/subscribe [::subs/show-generate-dialog?])
         generate-choice (reagent/atom nil)
@@ -574,3 +574,58 @@
                    (text->hiccup @modal-result)]])
         [reset-dialog]
         [history-dialog]]]]]))
+
+(def starting-character-keys (concat db/character-traits
+                                     db/starting-equipment))
+
+(defn character-row
+  [even? character k]
+  [re-com/h-box
+   :class (if even? "character-even" "character-odd")
+   :children [[:span {:class "mono character-left"} (keyword->display-str k)]
+              [re-com/line :size "2px" :color aqua-green]
+              [:span {:class "montserrat character-right"}
+               (text->hiccup (get character k))]]])
+
+(defn new-character-panel []
+  (let [character @(re-frame/subscribe [::subs/new-character])]
+    [re-com/v-box
+     :children
+     [[re-com/h-box
+       :class "character-header"
+       :width "100%"
+       :style {:align-contents "center"}
+       :children
+       [[re-com/title
+         :class "character-header"
+         :level :level2
+         :label "New Character"]
+        [re-com/gap :size "1"]
+        [re-com/md-icon-button
+         :class "button"
+         :size :larger
+         :style {:align-self "center"}
+         :md-icon-name "zmdi-refresh"
+         :on-click #(re-frame/dispatch [::events/generate-new-character])]
+        [re-com/gap :size "20px"]]]
+      [re-com/gap :size "5px"]
+      (for [[idx trait] (map-indexed vector starting-character-keys)]
+        ^{:key idx} [character-row (even? idx) character trait])]]))
+
+(defn not-found-panel []
+  [re-com/v-box
+   :children [[re-com/title
+               :class "mono"
+               :style {:padding-left "20px"}
+               :level :level1
+               :label "Not Found"]]])
+
+(defn pages [page-name]
+  (case page-name
+    :home [shifting-sands-panel]
+    :new-character [new-character-panel]
+    :not-found [not-found-panel]))
+
+(defn main-panel []
+  (let [active-page @(re-frame/subscribe [::subs/active-page])]
+    (pages active-page)))

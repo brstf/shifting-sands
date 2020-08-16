@@ -180,6 +180,38 @@
                     "Airbladder"
                     "{{ranged-weapon}}"])
 
+(def physique ["Gaunt" "Scrawny" "Slender" "Wiry" "Flabby" "Average"
+               "Average" "Athletic" "Stout" "Brawny" "Ripped" "Hulking"])
+
+(def face ["Blunt" "Bony" "Chiseled" "Delicate" "Elongated" "Pinched"
+           "Hawkish" "Ratlike" "Round" "Sunken" "Square" "Wolfish"])
+
+(def hair ["Bald" "Braided" "Bristly" "Cropped" "Curly" "Disheveled"
+           "Dreadlocks" "Filthy" "Frizzy" "Greased" "Limp" "Long"
+           "Luxurious" "Mohawk" "Oily" "Ponytail" "Silky" "Topknot"
+           "Wavy" "Wispy"])
+
+(def height (concat (repeat 2 "Tiny")
+                    (repeat 2 "Short")
+                    (repeat 4 "Average")
+                    (repeat 2 "Tall")
+                    (repeat 2 "Towering")))
+
+(def speech ["Blunt" "Booming" "Breathy" "Cryptic" "Droning" "Flowery"
+             "Formal" "Gravelly" "Mumbling" "Quaint" "Squeaky" "Whispery"])
+
+(def clothing ["Antique" "Ceremonial" "Decorated" "Eccentric" "Elegant"
+               "Fashionable" "Filthy" "Stained" "Frayed" "Shabby" "Patched"
+               "Simple"])
+
+(def passions ["Lazy (N/A)" "Athletics (STR)" "Acrobatics (DEX)"
+               "Hard Work (CON)" "Learning (INT)" "Experience (WIS)"
+               "Socializing (CHA)" "Martial Arts (STR)" "Craftsmanship (DEX)"
+               "Cooking (CON)" "Magic (INT)" "Spirituality (WIS)"
+               "Music (CHA)" "Swimming (STR)" "Travel (CON)" "Dance (DEX)"
+               "Science (INT)" "Marksmanship (WIS)" "Art (CHA)"
+               "Prodigy (Pick Two)"])
+
 (def a-mana-me ["Fire" "Water" "Electric" "Poison"])
 
 (def universal-rooms
@@ -1270,121 +1302,139 @@
      ::generate-fn ::fill-str-templates
      }]
    ::melee-weapon
-   [
-    {
-     ::index #{1 2 3 4}
-     ::description {
-                    ::name "Dagger"
+   [{::index #{1 2 3 4}
+     ::description {::name "Dagger"
                     ::damage "1d6 Pierce"
                     ::slot 1
                     ::hand 1
-                    ::quality 3
-                    }
-     ::generate-fn ::add-weapon-price
-     }
-    {
-     ::index #{5 6}
-     ::description {
-                    ::name "Cudgel"
+                    ::quality 3}
+     ::generate-fn ::add-weapon-price}
+    {::index #{5 6}
+     ::description {::name "Cudgel"
                     ::damage "1d6 Bludgeon"
                     ::slot 1
                     ::hand 1
                     ::quality 3}
-     ::generate-fn ::add-weapon-price
-     }
-    {
-     ::index #{7}
-     ::description {
-                    ::name "Sickle"
+     ::generate-fn ::add-weapon-price}
+    {::index #{7}
+     ::description {::name "Sickle"
                     ::damage "1d6 Slash"
                     ::slot 1
                     ::hand 1
-                    ::quality 3
-                    }
-     ::generate-fn ::add-weapon-price
-     }
-    {
-     ::index #{8 9}
-     ::description {
-                    ::name "Mace"
+                    ::quality 3}
+     ::generate-fn ::add-weapon-price}
+    {::index #{8 9}
+     ::description {::name "Mace"
                     ::damage "1d8 Bludgeon"
                     ::slot 2
                     ::hand 1
-                    ::quality 3
-                    }
-     ::generate-fn ::add-weapon-price
-     }
-    {
-     ::index #{10 11 12 13}
-     ::description {
-                    ::name "Spear"
+                    ::quality 3}
+     ::generate-fn ::add-weapon-price}
+    {::index #{10 11 12 13}
+     ::description {::name "Spear"
                     ::damage "1d8 Pierce"
                     ::slot 2
                     ::hand 1
-                    ::quality 3
-                    }
-     ::generate-fn ::add-weapon-price
-     }
-    {
-     ::index #{14}
-     ::description {
-                    ::name "Hand Ax/Sword"
+                    ::quality 3}
+     ::generate-fn ::add-weapon-price}
+    {::index #{14}
+     ::description {::name "Hand Ax/Sword"
                     ::damage "1d8 Slash"
                     ::slot 2
                     ::hand 1
-                    ::quality 3
-                    }
-     ::generate-fn ::add-weapon-price
-     }
-    {
-     ::index #{15}
-     ::description {
-                    ::name "Eku"
+                    ::quality 3}
+     ::generate-fn ::add-weapon-price}
+    {::index #{15}
+     ::description {::name "Eku"
                     ::damage "1d8 Slash or Bludgeon"
                     ::slot 3
                     ::hand 2
-                    ::quality 3
-                    }
-     ::generate-fn ::add-weapon-price
-     }
-    {
-     ::index #{16}
-     ::description {
-                    ::name "Hammer"
+                    ::quality 3}
+     ::generate-fn ::add-weapon-price}
+    {::index #{16}
+     ::description {::name "Hammer"
                     ::damage "1d10 Bludgeon"
                     ::slot 3
                     ::hand 2
-                    ::quality 3
-                    }
-     ::generate-fn ::add-weapon-price
-     }
-    {
-     ::index #{17 18}
-     ::description {
-                    ::name "Harpoon"
+                    ::quality 3}
+     ::generate-fn ::add-weapon-price}
+    {::index #{17 18}
+     ::description {::name "Harpoon"
                     ::damage "1d10 Pierce"
                     ::slot 3
                     ::hand 2
-                    ::quality 3
-                    }
-     ::generate-fn ::add-weapon-price
-     }
-    {
-     ::index #{19}
-     ::description {
-                    ::name "Ax/Longsword"
+                    ::quality 3}
+     ::generate-fn ::add-weapon-price}
+    {::index #{19}
+     ::description {::name "Ax/Longsword"
                     ::damage "1d10 Slash"
                     ::slot 2
                     ::hand 2
-                    ::quality 3
-                    }
-     ::generate-fn ::add-weapon-price
-     }
-    {
-     ::index #{20}
-     ::generate-fn ::generate-exotic-weapon
-     }
-    ]
+                    ::quality 3}
+     ::generate-fn ::add-weapon-price}
+    {::index #{20}
+     ::generate-fn ::generate-exotic-weapon}]
+   ::starting-weapon
+   [{::index #{1 2 3 4 5}
+     ::description {::name "Dagger"
+                    ::damage "1d6 Pierce"
+                    ::slot 1
+                    ::hand 1
+                    ::quality 3}}
+    {::index #{6 7}
+     ::description {::name "Cudgel"
+                    ::damage "1d6 Bludgeon"
+                    ::slot 1
+                    ::hand 1
+                    ::quality 3}}
+    {::index #{8}
+     ::description {::name "Sickle"
+                    ::damage "1d6 Slash"
+                    ::slot 1
+                    ::hand 1
+                    ::quality 3}}
+    {::index #{9 10}
+     ::description {::name "Mace"
+                    ::damage "1d8 Bludgeon"
+                    ::slot 2
+                    ::hand 1
+                    ::quality 3}}
+    {::index #{11 12 13 14}
+     ::description {::name "Spear"
+                    ::damage "1d8 Pierce"
+                    ::slot 2
+                    ::hand 1
+                    ::quality 3}}
+    {::index #{15}
+     ::description {::name "Hand Ax/Sword"
+                    ::damage "1d8 Slash"
+                    ::slot 2
+                    ::hand 1
+                    ::quality 3}}
+    {::index #{16}
+     ::description {::name "Eku"
+                    ::damage "1d8 Slash or Bludgeon"
+                    ::slot 3
+                    ::hand 2
+                    ::quality 3}}
+    {::index #{17}
+     ::description {::name "Hammer"
+                    ::damage "1d10 Bludgeon"
+                    ::slot 3
+                    ::hand 2
+                    ::quality 3}}
+    {::index #{18 19}
+     ::description {::name "Harpoon"
+                    ::damage "1d10 Pierce"
+                    ::slot 3
+                    ::hand 2
+                    ::quality 3}}
+    {::index #{20}
+     ::description {::name "Ax/Longsword"
+                    ::damage "1d10 Slash"
+                    ::slot 2
+                    ::hand 2
+                    ::quality 3}}]
    ::exotic-weapon-trait
    [
     {
@@ -1475,33 +1525,45 @@
      ::generate-fn ::add-weapon-price
      }]
    ::armor
-   [
-    {
-     ::index #{1 2 3}
+   [{::index #{1 2 3}
      ::description {::name "No Armor"
-                    ::defense 11}
-     }
-    {
-     ::index #{4 5 6 7 8 9 10 11 12 13 14}
+                    ::defense 11}}
+    {::index #{4 5 6 7 8 9 10 11 12 13 14}
      ::description {::name "Canvas Tunic"
                     ::defense 12
                     ::slot 1
-                    ::quality 3}
-     }
-    {
-     ::index #{15 16 17 18 19}
+                    ::quality 3}}
+    {::index #{15 16 17 18 19}
      ::description {::name "Seal Leather"
                     ::defense 13
                     ::slot 2
-                    ::quality 4}
-     }
-    {
-     ::index #{20}
+                    ::quality 4}}
+    {::index #{20}
      ::description {::name "Iron-Scale Mail"
                     ::defense 14
                     ::slot 3
-                    ::quality 5}
-     }]
+                    ::quality 5}}]
+   ::helmets-and-shields
+   [{::index #{1 2 3 4 5 6 7 8 9 10 11 12 13}
+     ::description {::name "None or Hat"
+                    ::defense 11}}
+    {::index #{14 15 16}
+     ::description {::name "Helmet"
+                    ::defense "+1"
+                    ::slot 1
+                    ::quality 1}}
+    {::index #{17 18 19}
+     ::description {::name "Shield"
+                    ::defense "+1"
+                    ::slot 1
+                    ::quality 1
+                    ::hand 1}}
+    {::index #{20}
+     ::description {::name "Helmet and Shield"
+                    ::defense "+1/+1"
+                    ::slot "1/1"
+                    ::quality "1/1"
+                    ::hand "0/1"}}]
    ::open-water-pelagic
    [{::index #{1}
      ::description "3 Chum float through"}
@@ -1544,6 +1606,13 @@
    ::slug-color (list->generate-map slug-colors)
    ::slug-effect (list->generate-map slug-effects)
    ::coral (list->generate-map coral)
+   ::physique (list->generate-map physique)
+   ::face (list->generate-map face)
+   ::hair (list->generate-map hair)
+   ::height (list->generate-map height)
+   ::speech (list->generate-map speech)
+   ::clothing (list->generate-map clothing)
+   ::passion (list->generate-map passions)
    })
 
 (defn get-table-names
@@ -2085,6 +2154,28 @@
         (merge {::room-index (count (::map floor-state))})
         (add-situation floor-state adv)))))
 
+(defn generate-trait [trait]
+  (::name (generate nil [trait])))
+
+(def character-traits
+  [::physique ::face ::hair ::height ::speech ::clothing ::passion])
+
+(def starting-equipment
+  [::weapon ::armor ::helmet-and-shield ::general-gear-1
+   ::general-gear-2 ::dungeoneering-gear])
+
+(defn generate-starting-equipment []
+  {::weapon (weapon->str (generate nil [::starting-weapon]))
+   ::armor (armor->str (generate nil [::armor]))
+   ::helmet-and-shield (armor->str (generate nil [::helmets-and-shields]))
+   ::general-gear-1 (::name (generate nil [::general-gear1]))
+   ::general-gear-2 (::name (generate nil [::general-gear2]))
+   ::dungeoneering-gear (::description (generate nil [::dungeoneering-gear]))})
+
+(defn generate-new-character []
+  (-> (into {} (map (juxt identity generate-trait) character-traits))
+      (merge (generate-starting-equipment))))
+
 (defn init-floor
   "Initiate a floor in the db for the given level e.g. :pelagic"
   [level]
@@ -2105,6 +2196,7 @@
   ([db] (init-db db true))
   ([db reset-slugs?]
    (merge (-> db
+              (assoc ::active-page :home)
               (assoc ::current-floor ::pelagic)
               (assoc ::floors (init-floors))
               (assoc ::history [])

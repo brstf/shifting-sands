@@ -157,6 +157,41 @@ svg {
     overflow-y: auto;
 }
 
+.character-header {
+    background-color: #679781;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 10px;
+    font-family: 'Major Mono Display', monospace;
+    color: #FFFFFF;
+}
+
+.character-even {
+    background-color: #FFFFFF;
+}
+
+.character-odd {
+    background-color: #F6FBFA;
+}
+
+.character-left {
+    width: 230px;
+    height: auto;
+    padding: 5px;
+    align-self: center;
+    font-size: 18px;
+    color: #212121;
+}
+
+.character-right {
+    width: 100%;
+    height: auto;
+    padding: 5px;
+    font-size: 18px;
+    align-self: center;
+    color: #212121;
+}
+
 .menu-button {
     font-family: 'Montserrat', sans-serif;
     font-size: 2em;

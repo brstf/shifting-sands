@@ -121,3 +121,11 @@
 (re-frame/reg-sub
  ::current-room
  (fn [db _] (get db ::db/current-room)))
+
+(re-frame/reg-sub
+ ::active-page
+ (fn [db _] (get db ::db/active-page)))
+
+(re-frame/reg-sub
+ ::new-character
+ (fn [db _] (get db ::db/new-character)))
