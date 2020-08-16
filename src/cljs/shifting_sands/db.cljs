@@ -1857,13 +1857,14 @@
        (if (::special weapon) (str "Special: " (::special weapon) "\n"))))
 
 (defn armor->str
-  [{armor ::description}]
-  (if (= (::name armor)"No Armor")
-    "Rusted, tattered, useless armor"
-    (str (::name armor) "\n"
-         "Defense: " (::defense armor) "\n"
-         "Slot: " (::slot armor) "\n"
-         "Quality: " (::quality armor))))
+  ([armor] (armor->str armor false))
+  ([{armor ::description} starting?]
+   (if (and (not starting?) (= (::name armor) "No Armor"))
+     "Rusted, tattered, useless armor"
+     (str (::name armor) "\n"
+          "Defense: " (::defense armor) "\n"
+          "Slot: " (::slot armor) "\n"
+          "Quality: " (::quality armor)))))
 
 (defn generate-slug []
   (first (shuffle slug-colors)))
@@ -2166,7 +2167,7 @@
 
 (defn generate-starting-equipment []
   {::weapon (weapon->str (generate nil [::starting-weapon]))
-   ::armor (armor->str (generate nil [::armor]))
+   ::armor (armor->str (generate nil [::armor]) true)
    ::helmet-and-shield (armor->str (generate nil [::helmets-and-shields]))
    ::general-gear-1 (::name (generate nil [::general-gear1]))
    ::general-gear-2 (::name (generate nil [::general-gear2]))
