@@ -1569,12 +1569,14 @@
      ::description "3 Chum float through"}
     {::index #{2}
      ::description (str "A sack of Loot floats past. It contains:\n"
-                        "- {{loot}}\n- {{loot}}\n-{{loot}}")}
+                        "- {{loot}}\n- {{loot}}\n- {{loot}}")
+     ::generate-fn ::fill-str-templates}
     {::index #{3 4}
      ::description "Someone sent the dead's Sand down. Gain 500 sand"}
     {::index #{5}
      ::description (str "A wooden figurine. This figurine functions as "
-                        "a spellpearl with {{spell}}")}
+                        "a spellpearl with {{spell}}")
+     ::generate-fn ::fill-str-templates}
     {::index #{6}
      ::description "An Eelaconda enters."}]
    ::sinking-ship
