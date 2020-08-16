@@ -192,6 +192,11 @@ svg {
     color: #212121;
 }
 
+a .menu-button {
+    text-decoration: none;
+    color:inherit;
+}
+
 .menu-button {
     font-family: 'Montserrat', sans-serif;
     font-size: 2em;

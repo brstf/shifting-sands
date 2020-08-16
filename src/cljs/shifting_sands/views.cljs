@@ -5,6 +5,7 @@
    [re-frame.core :as re-frame]
    [re-com.core :as re-com]
    [shifting-sands.events :as events]
+   [shifting-sands.router :as router]
    [shifting-sands.subs :as subs]
    [shifting-sands.db :as db]
    [cljs-time.core :as time]
@@ -382,6 +383,12 @@
          :on-click #(re-frame/dispatch [::events/show-reset-dialog])}
    "Reset All"])
 
+(defn new-character-button []
+  [:a {:href (router/url-for :new-character)
+       :style {:color "inherit"
+               :text-decoration "none"}
+       :class "menu-button"} "New Character"])
+
 (defn button-overlay []
   (let [showing? (reagent/atom false)]
     [re-com/popover-anchor-wrapper
@@ -400,6 +407,7 @@
                                  [slugs-button]
                                  [generate-button]
                                  [history-button]
+                                 [new-character-button]
                                  [reset-button]]]]]))
 
 (defn right-panel []
