@@ -6,6 +6,10 @@
    [cljs-time.core :as time]
    [clojure.string :as string]))
 
+(def ->local-store (re-frame/after db/state->local-store))
+
+(def interceptors [->local-store])
+
 (defn get-room-index [db coord]
   (let [floor (::db/current-floor db)]
     (get-in db [::db/floors floor ::db/map coord ::db/room-index])))
@@ -21,25 +25,30 @@
                       :dispatch [::generate-new-character]}
       :not-found {:db set-page}))))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  ::initialize-db
- (fn-traced [_ _]
-            db/default-db))
+ [(re-frame/inject-cofx :local-store-state)]
+ (fn-traced
+  [{:keys [db local-store-state]} _]
+  {:db (merge db/default-db local-store-state)}))
 
 (re-frame/reg-event-db
  ::init-floor
+ interceptors
  (fn-traced
   [db [_ floor]]
   (assoc-in db [::db/floors floor] (db/init-floor floor))))
 
 (re-frame/reg-event-db
  ::change-floor
+ interceptors
  (fn-traced
   [db [_ floor]]
   (assoc db ::db/current-floor floor)))
 
 (re-frame/reg-event-db
  ::generate-loot
+ interceptors
  (fn-traced
   [{floor ::db/current-floor :as db} _]
   (let [loot (db/generate-loot (get-in db [::db/floors floor]))]
@@ -59,6 +68,7 @@
 
 (re-frame/reg-event-db
  ::generate-encounter
+ interceptors
  (fn-traced
   [{floor ::db/current-floor :as db} [_ coord]]
   (let [adv (get-in db [::db/floors floor ::db/map coord ::db/danger])
@@ -74,6 +84,7 @@
 
 (re-frame/reg-event-db
  ::force-shop
+ interceptors
  (fn-traced
   [{floor ::db/current-floor :as db} [_ coord]]
   (let [shop (db/generate-shop (get-in db [::db/floors floor]))]
@@ -87,6 +98,7 @@
 
 (re-frame/reg-event-db
  ::force-shrine
+ interceptors
  (fn-traced
   [{floor ::db/current-floor :as db} [_ coord]]
   (let [shrine (db/generate-shrine (get-in db [::db/floors floor]))]
@@ -130,6 +142,7 @@
 
 (re-frame/reg-event-db
  ::reset-all
+ interceptors
  (fn-traced
   [db [_ reset-slugs?]]
   (-> (db/init-db db reset-slugs?)
@@ -137,6 +150,7 @@
 
 (re-frame/reg-event-db
  ::rotate-room
+ interceptors
  (fn-traced
   [{floor ::db/current-floor :as db} [_ coord dir]]
   (-> (update-in db [::db/floors floor ::db/map coord] #(db/rotate-room % dir))
@@ -157,6 +171,7 @@
 
 (re-frame/reg-event-db
  ::generate-room
+ interceptors
  (fn-traced
   [{floor ::db/current-floor adv ::db/room-adv :as db} [_ coord from-dir]]
   (let [floor-state (db/generate-room (get-in db [::db/floors floor])
@@ -179,6 +194,7 @@
 
 (re-frame/reg-event-db
  ::regenerate-room
+ interceptors
  (fn-traced
   [{floor ::db/current-floor :as db} [_ coord from-dir]]
   (let [prev (get-in db [::db/floors floor ::db/map coord])
@@ -219,6 +235,7 @@
 
 (re-frame/reg-event-db
  ::generate-generic
+ interceptors
  (fn-traced
   [db [_ path adv]]
   (let [floor (if (db/floors (last path)) (last path) (::db/current-floor db))
@@ -258,6 +275,7 @@
 
 (re-frame/reg-event-db
  ::update-notes
+ interceptors
  (fn-traced
   [{floor ::db/current-floor :as db} [_ coord notes]]
   (assoc-in db [::db/floors floor ::db/map coord ::db/notes] notes)))
@@ -289,6 +307,7 @@
 
 (re-frame/reg-event-db
  ::current-room
+ interceptors
  (fn-traced
   [db [_ floor coord]]
   (assoc db ::db/current-room {::db/floor floor ::db/coord coord})))

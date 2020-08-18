@@ -1,6 +1,9 @@
 (ns shifting-sands.db
   (:require [cljs.spec.alpha :as s]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [cljs-time.format :as f]
+            [cljs-time.core :as time]
+            [re-frame.core :as re-frame]))
 
 (defn list->generate-map
   ([coll] (list->generate-map coll nil))
@@ -2209,3 +2212,38 @@
           (if reset-slugs? {::slugs (generate-slug-map)}))))
 
 (def default-db (init-db  {:name "shifting-sands"}))
+
+;; EDN
+
+(def ls-key "app-state")
+
+;; Keys to save to local storage from the app DB
+(def state-keys [::current-room ::current-floor ::slugs ::floors ::history])
+
+(def iso8601-formatter (f/formatters :date-time))
+
+(defn- datetime->reader-str [d]
+  (str "#DateTime \"" (f/unparse iso8601-formatter d) \"))
+
+(defn- reader-str->datetime [s]
+  (f/parse iso8601-formatter s))
+
+(do (extend-protocol IPrintWithWriter
+      goog.date.DateTime
+      (-pr-writer [d out opts]
+        (-write out (datetime->reader-str d)))))
+
+(defn state->local-store
+  "Puts app state (map, history, current-room, etc.)  into localStorage"
+  [db]
+  (.setItem js/localStorage ls-key (str (select-keys db state-keys)))) 
+
+(re-frame/reg-cofx
+ :local-store-state
+ (fn [cofx _]
+   ;; put the localstore state into the coeffect under :local-store-state
+   (assoc cofx :local-store-state
+          ;; read the state from localstore, and process into a map
+          (some->> (.getItem js/localStorage ls-key)
+                   (cljs.reader/read-string
+                    {:readers {'DateTime reader-str->datetime}})))))
