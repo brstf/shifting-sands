@@ -1,7 +1,9 @@
-# shifting-sands
+# Shifting Sands
 
-A [re-frame](https://github.com/day8/re-frame) application designed to ... well, that part is up to
-you.
+A map generator for [A Rasp of Sand](https://www.davecox.design/a-rasp-of-sand) by [Dave Cox](https://twitter.com/DastrdlyDave). 
+
+Check it out [here](https://brstf.github.io/shifting-sands/).
+Also contains a [new character attribute generator](https://brstf.github.io/shifting-sands/new-character) for players.
 
 ## Getting Started
 
