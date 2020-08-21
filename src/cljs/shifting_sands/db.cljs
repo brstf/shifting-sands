@@ -3,6 +3,7 @@
             [clojure.string :as str]
             [cljs-time.format :as f]
             [cljs-time.core :as time]
+            [cljs.reader :as reader]
             [re-frame.core :as re-frame]))
 
 (defn list->generate-map
@@ -2245,5 +2246,5 @@
    (assoc cofx :local-store-state
           ;; read the state from localstore, and process into a map
           (some->> (.getItem js/localStorage ls-key)
-                   (cljs.reader/read-string
+                   (reader/read-string
                     {:readers {'DateTime reader-str->datetime}})))))

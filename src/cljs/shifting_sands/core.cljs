@@ -8,9 +8,6 @@
    [shifting-sands.config :as config]
    ))
 
-(def routes [["/" :main
-              "/new-character" :new-character]])
-
 (defn dev-setup []
   (when config/debug?
     (println "dev mode")))
