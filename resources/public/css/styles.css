@@ -6,7 +6,7 @@ p {
     font-family: 'Montserrat', sans-serif;
 }
 
-.unselectable {
+.unselectable, .menu-button {
     /* https://stackoverflow.com/questions/6900124/how-to-make-certain-text-not-selectable-with-css */
     -webkit-user-select: none; /* Safari */        
     -moz-user-select: none; /* Firefox */
