@@ -14,7 +14,7 @@
 
 (def history
   (let [dispatch #(re-frame/dispatch [::events/set-active-page {:page (:handler %)}])
-        match #(do (print %) (print (bidi/match-route routes %)) (bidi/match-route routes %))]
+        match #(bidi/match-route routes %)]
     (pushy/pushy dispatch match)))
 
 (defn start! []
