@@ -389,6 +389,15 @@
                :text-decoration "none"}
        :class "menu-button"} "New Character"])
 
+(defn source-link []
+  [:a {:href "https://github.com/brstf/shifting-sands"
+       :style {:color "inherit"
+               :text-decoration "none"}
+       :class "menu-button"} "View Source"
+   [re-com/md-icon-button
+    :md-icon-name "zmdi-github"
+    :disabled? true]])
+
 (defn button-overlay []
   (let [showing? (reagent/atom false)]
     [re-com/popover-anchor-wrapper
@@ -408,7 +417,8 @@
                                  [generate-button]
                                  [history-button]
                                  [new-character-button]
-                                 [reset-button]]]]]))
+                                 [reset-button]
+                                 [source-link]]]]]))
 
 (defn right-panel []
   [re-com/box
