@@ -18,14 +18,6 @@ p {
     font-family: 'Major Mono Display', monospace;
 }
 
-/*.button-container div {
-    font-family: 'Major Mono Display', monospace;
-}
-
-.button-container p {
-    font-family: 'Major Mono Display', monospace;
-}*/
-
 svg {
     pointer-events: none;
 }
@@ -102,6 +94,10 @@ svg {
 .main-panel {
     padding-top: 10px;
     height: auto;
+}
+
+.menu {
+    overflow-y: auto;
 }
 
 .button-container {

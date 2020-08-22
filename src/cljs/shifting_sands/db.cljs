@@ -4,6 +4,7 @@
             [cljs-time.format :as f]
             [cljs-time.core :as time]
             [cljs.reader :as reader]
+            [cljs-time.core :as time]
             [re-frame.core :as re-frame]))
 
 (defn list->generate-map
@@ -277,6 +278,7 @@
    {
     ::name "Exit"
     ::id ::exit
+    ::danger 0
     ::num-hallways 1
     }
    })
@@ -1684,13 +1686,36 @@
 (s/def ::index (s/coll-of ::pos-int))
 (s/def ::danger (s/and int? #(<= -3 0 3)))
 (s/def ::name string?)
+(s/def ::notes string?)
 (s/def ::dir dirs)
+(s/def ::from-dir dirs)
+(s/def ::description string?)
 (s/def ::hallways (s/coll-of ::dir))
 (s/def ::secret-hallways (s/coll-of ::dir))
 (s/def ::room-index (s/and int? #(>= % 0)))
 (s/def ::generated-room (s/keys :req [::name ::hallways ::danger
                                       ::room-index]
-                                :opt [::secret-hallways ::situation ::id]))
+                                :opt [::secret-hallways ::situation ::id
+                                      ::notes ::index ::adv ::from-dir
+                                      ::roll ::description]))
+
+;; Slugs
+(s/def ::slug-color (set slug-colors))
+(s/def ::slug-effect (set slug-effects))
+
+;; New Character
+(s/def ::speech (set speech))
+(s/def ::hair (set hair))
+(s/def ::height (set height))
+(s/def ::face (set face))
+(s/def ::clothing (set clothing))
+(s/def ::physique (set physique))
+(s/def ::passion (set passions))
+(s/def ::general-gear-1 string?)
+(s/def ::general-gear-2 string?)
+(s/def ::armor string?)
+(s/def ::weapon string?)
+(s/def ::dungeoneering-gear string?)
 
 ;; Floor state
 (s/def ::coord (s/tuple int? int?))
@@ -1698,6 +1723,27 @@
 (s/def ::floor floors)
 (s/def ::exit-index (s/and int? #(<= 1 10)))
 (s/def ::floor-state (s/keys :req [::map ::floor ::exit-index]))
+
+;; History
+(s/def ::time #(time/date? %))
+(s/def ::history-event (s/keys :req [::time ::description]
+                               :opt [::room-index ::floor]))
+(s/def ::history (s/coll-of ::history-event))
+
+;; DB
+(s/def ::floors (s/map-of ::floor ::floor-state))
+(s/def ::slugs (s/map-of ::slug-color ::slug-effect))
+(s/def ::room-adv (s/and int? #(<= -3 % 3)))
+(s/def ::current-floor floors)
+(s/def ::active-page #{:home :new-character :not-found})
+(s/def ::current-room (s/keys :req [::floor ::coord]))
+(s/def ::new-character (s/keys :req [::speech ::hair ::height ::face
+                                     ::clothing ::physique ::passion
+                                     ::general-gear-1 ::general-gear-2
+                                     ::armor ::weapon ::dungeoneering-gear]))
+(s/def ::db (s/keys :req [::current-room ::active-page ::room-adv
+                          ::current-floor ::slugs ::floors ::history]
+                    :opt [::new-character]))
 
 (defn abs [n] (max n (- n)))
 

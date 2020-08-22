@@ -153,7 +153,7 @@
 
 (defn encounter-button [coord room-map]
   [:div {:class "menu-button"
-         :on-click #(re-frame/dispatch [::events/generate-encounter])}
+         :on-click #(re-frame/dispatch [::events/generate-encounter coord])}
    "Encounter"])
 
 (defn rotate-button [coord dir]
@@ -412,6 +412,7 @@
      :popover [re-com/popover-content-wrapper
                :on-cancel #(swap! showing? not)
                :body [re-com/v-box
+                      :class "menu"
                       :children [[loot-button]
                                  [slugs-button]
                                  [generate-button]
@@ -548,7 +549,9 @@
           [:th [:p {:class "header"} [:b "Room" [:br] "Index"]]]
           [:th [:p {:class "header"} [:b "Description"]]]]]
         [:tbody
-         (for [[idx {:keys [description room-index floor time]}]
+         (for [[idx {description ::db/description
+                     room-index ::db/room-index
+                     floor ::db/floor time ::db/time}]
                (map-indexed (comp vec list) @history)]
            ^{:key idx} [:tr
                         [:td (time-format/unparse-local-date

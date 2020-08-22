@@ -4,7 +4,16 @@
    [shifting-sands.db :as db]
    [day8.re-frame.tracing :refer-macros [fn-traced]]
    [cljs-time.core :as time]
+   [clojure.spec.alpha :as s]
    [clojure.string :as string]))
+
+(defn check-and-throw
+  "Throws an exception if `db` doesn't match the Spec `a-spec`."
+  [a-spec db]
+  (when-not (s/valid? a-spec db)
+    (throw (ex-info (str "spec check failed: " (s/explain-str a-spec db)) {}))))
+
+(def check-spec-interceptor (re-frame/after (partial check-and-throw ::db/db)))
 
 (def ->local-store (re-frame/after db/state->local-store))
 
@@ -55,9 +64,9 @@
     (-> (assoc db ::db/modal-result (::db/description loot))
         (update
          ::db/history
-         #(conj % {:description (::db/description loot)
-                   :floor floor
-                   :time (time/now)}))))))
+         #(conj % {::db/description (::db/description loot)
+                   ::db/floor floor
+                   ::db/time (time/now)}))))))
 
 (defn item->str [enc]
   (let [name (::db/name enc)
@@ -77,10 +86,11 @@
     (-> (assoc db ::db/modal-result (::db/description enc))
         (update
          ::db/history
-         #(conj % {:description (item->str enc)
-                   :room-index (get-room-index db coord)
-                   :floor floor
-                   :time (time/now)}))))))
+         #(conj % {::db/description (str "Generated encounter: "
+                                         (item->str enc))
+                   ::db/room-index (get-room-index db coord)
+                   ::db/floor floor
+                   ::db/time (time/now)}))))))
 
 (re-frame/reg-event-db
  ::force-shop
@@ -91,10 +101,11 @@
     (-> (assoc-in db [::db/floors floor ::db/map coord ::db/situation] shop)
         (update
          ::db/history
-         #(conj % {:description (str "Forced Shop:\n" (::db/description shop))
-                   :room-index (get-room-index db coord)
-                   :floor floor
-                   :time (time/now)}))))))
+         #(conj % {::db/description (str "Forced Shop:\n"
+                                         (::db/description shop))
+                   ::db/room-index (get-room-index db coord)
+                   ::db/floor floor
+                   ::db/time (time/now)}))))))
 
 (re-frame/reg-event-db
  ::force-shrine
@@ -105,10 +116,10 @@
     (-> (assoc-in db [::db/floors floor ::db/map coord ::db/situation] shrine)
         (update
          ::db/history
-         #(conj % {:description (str "Forced Shrine: " (::db/name shrine))
-                   :room-index (get-room-index db coord)
-                   :floor floor
-                   :time (time/now)}))))))
+         #(conj % {::db/description (str "Forced Shrine: " (::db/name shrine))
+                   ::db/room-index (get-room-index db coord)
+                   ::db/floor floor
+                   ::db/time (time/now)}))))))
 
 (re-frame/reg-event-db
  ::clear-modal-result
@@ -156,16 +167,17 @@
   (-> (update-in db [::db/floors floor ::db/map coord] #(db/rotate-room % dir))
       (update
        ::db/history
-       #(conj % {:description (str "Rotate " (string/upper-case (name dir)))
-                 :room-index (get-room-index db coord)
-                 :floor floor
-                 :time (time/now)})))))
+       #(conj % {::db/description (str "Rotate "
+                                       (string/upper-case (name dir)))
+                 ::db/room-index (get-room-index db coord)
+                 ::db/floor floor
+                 ::db/time (time/now)})))))
 
 (defn generate-history-log [desc ridx floor]
-  {:description desc
-   :room-index ridx
-   :floor floor
-   :time (time/now)})
+  {::db/description desc
+   ::db/room-index ridx
+   ::db/floor floor
+   ::db/time (time/now)})
 
 (def adv->str (partial db/adv->str ""))
 
@@ -251,10 +263,10 @@
         (assoc ::db/generate-result item)
         (update
          ::db/history
-         #(conj % {:description (str  "Generate" (adv->str adv) ": "
-                                      (item->str item))
-                   :floor floor
-                   :time (time/now)}))))))
+         #(conj % {::db/description (str  "Generate" (adv->str adv) ": "
+                                          (item->str item))
+                   ::db/floor floor
+                   ::db/time (time/now)}))))))
 
 (re-frame/reg-event-db
  ::clear-generate-result
