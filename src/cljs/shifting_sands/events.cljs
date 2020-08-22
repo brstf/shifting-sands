@@ -233,13 +233,20 @@
   [db _]
   (dissoc db ::db/show-generate-dialog)))
 
+(defn stringify-desc [{desc ::db/description :as item}]
+  (merge
+   item
+   (when (::db/defense desc) {::db/description (db/armor->str item)})
+   (when (::db/damage desc) {::db/description (db/weapon->str item)})))
+
 (re-frame/reg-event-db
  ::generate-generic
  interceptors
  (fn-traced
   [db [_ path adv]]
   (let [floor (if (db/floors (last path)) (last path) (::db/current-floor db))
-        item (db/generate (get-in db [::db/floors floor]) path adv)]
+        item (-> (db/generate (get-in db [::db/floors floor]) path adv)
+                 stringify-desc)]
     (-> db
         (assoc ::db/generate-result item)
         (update

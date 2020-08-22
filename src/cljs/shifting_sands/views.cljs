@@ -454,7 +454,7 @@
   [re-com/v-box
    :children [(when name [re-com/title :level :level2 :label name])
               (when description [:p {:style {:class "montserrat"}}
-                                 [:b description]])
+                                 [:b (text->hiccup description)]])
               (when roll [:p {:style {:class "montserrat"}}
                           [:b (str "Roll: " roll)]])]])
 
@@ -493,7 +493,7 @@
        :justify :end
        :children [[re-com/button
                    :label [:b "Generate"]
-                   :style {:width "100px"}
+                   :style {:width "120px"}
                    :disabled? disable-button?
                    :on-click #(re-frame/dispatch
                                [::events/generate-generic
@@ -580,10 +580,10 @@
         (when @show-generate?
           [re-com/modal-panel
            :backdrop-on-click
-           #((reset! generate-choice 0)
-             (reset! advantage-choice 3)
-             (re-frame/dispatch [::events/clear-generate-result])
-             (re-frame/dispatch [::events/hide-generate-dialog]))
+           #(do (reset! generate-choice 0)
+                (reset! advantage-choice 3)
+                (re-frame/dispatch [::events/clear-generate-result])
+                (re-frame/dispatch [::events/hide-generate-dialog]))
            :child [generate-dialog generate-choice advantage-choice]])
         (when @modal-result
           [re-com/modal-panel
