@@ -1757,7 +1757,6 @@
   (let [r (roll (str->int num) (str->int faces)
                 (* (case (first adv) \+ 1 \- -1 1) (count adv)))
         choice-map (choices->map choice-text)]
-    (print choice-map roll)
     (str/replace (get choice-map r) #"\{\{n\}\}" (str r))))
 
 (defn fill-die-roll-choice-template
