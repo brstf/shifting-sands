@@ -218,6 +218,23 @@
 
 (def a-mana-me ["Fire" "Water" "Electric" "Poison"])
 
+(def treasures ["An anchor with an unusually long shank"
+                "A vibrantly colored conch"
+                (str "A ship's wheel that has been retrofitted with a "
+                     "backing and handle")
+                (str "Horn made of tarnished brass that has the image "
+                     "of a lighthouse inscribed on it")
+                (str "A large crab's claw that has been strung with a "
+                     "fine thread")
+                "It looks somewhat like an ornate brass astrolabe"
+                "A large, two-handed, tree felling axe"
+                "A massive maul made of granite"
+                "A scythe that's blade is mostly transparent"
+                "A pick with a translucent head"
+                "A shovel with a head made of glass"
+                (str "A harpoon, the point appears to be made of "
+                     "volcanic rock and is split down the middle")])
+
 (def universal-rooms
   {::the-plunge
    {
@@ -1619,6 +1636,7 @@
    ::speech (list->generate-map speech)
    ::clothing (list->generate-map clothing)
    ::passion (list->generate-map passions)
+   ::treasures (list->generate-map treasures)
    })
 
 (defn get-table-names
