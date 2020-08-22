@@ -5,7 +5,66 @@ A map generator for [A Rasp of Sand](https://www.davecox.design/a-rasp-of-sand) 
 Check it out [here](https://brstf.github.io/shifting-sands/).
 Also contains a [new character attribute generator](https://brstf.github.io/shifting-sands/new-character) for players.
 
-## Getting Started
+## Usage
+
+### Generate Map
+
+![Genearting the map](demo/room-generation.gif)
+
+To generate rooms, click on the question mark in the direction the party is travelling.
+
+The party's current location is marked with brackets, you can update their location by clicking on a room.
+
+#### Generate Room Advantage
+
+![Generating a room with advantage](demo/generate-adv.gif)
+
+Some abilities grant advantage or disadvantage on room generation. To add instances of advantage/disadvantage to the generation roll, use the controls in the bottom left. The next room generated will use that advatntage, then reset it back to 0.
+
+### Room Options
+
+The triple dot in the upper-right corner of the room tile contains a menu with options for the room:
+
+- *Regenerate* - Regenerates the current room for different situations/parameters. Especially useful if a dead-end is generated before the exit:
+
+![Regenerate dead-end](demo/regenerate-dead-end.gif)
+
+- *Encounter* - Generates an encounter for the room. Takes the rooms _Danger_ into account
+
+![Generate encounter](demo/encounter.gif)
+
+- *Force Shop* - Replaces the room's situation with a shop for the Merchant's *Connections* ability
+- *Force Shrine* - Replaces the room's situation with a shrine for the Priest's *Guidance* ability
+- *Room Notes* - Expands a text box for general notes, like what rooms the Elevator or the Shelf link to, creatures in the room, items left behind, etc.
+
+![Note taking](demo/notes.gif)
+
+- *Rotate* - Rotates the room clockwise or counter-clockwise. Used for the _Leviathan's Wheel_
+
+![Rotate room](demo/rotate-room.gif)
+
+### Menu
+
+Contains global menu options:
+
+- *Loot!* - Generates a random piece of loot
+- *Slugs* - Shows the current mapping of slug color to effect
+- *Generate…* - Opens a dialog to generate any item off of any table in case something is needed outside of the automatic generation
+
+![Generate item](demo/generate.gif)
+
+- *History* - Shows a log of all events for reference
+- *New Character* - Navigates to the [new character page](#new-character-attributes)
+- *Reset All* - Resets all rooms and history for a new generation. From the confirmation dialog you can choose to not reset the slug table for the Academic's *Seeing the Patterns* ability
+- *View Source* - Brings you here!
+
+### New Character Attributes
+
+A separate page that generates all of the attributes of a new character except stats (because those depend on stats from the previous character, I might add something like that in the future though)
+
+## Dev - Getting Started
+
+The following is from the re-frame template generation, but should be useful if you want to build your own version or add features.
 
 ### Project Overview
 
