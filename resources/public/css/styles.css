@@ -162,10 +162,10 @@ svg {
 .stat-left {
     width: 160px;
     text-align: center;
-}
-
-.stat-left, .stat-right {
     border-left-style: solid;
+}
+    
+.stat-left, .stat-right {
     border-bottom-style: solid;
     border-right-style: solid;
     border-width: 1px;
