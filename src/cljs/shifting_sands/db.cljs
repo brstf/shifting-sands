@@ -2265,11 +2265,12 @@
   "Initiate a floor in the db for the given level e.g. :pelagic"
   [level]
   {::map (case level
-           ::the-reef {[0 0] (assoc (::the-plunge-reef universal-rooms)
-                                    ::room-index 0)
-                       [0 1] (merge (::the-great-barrier universal-rooms)
-                                    {::situation (generate {} [::situation])
-                                     ::room-index 1})}
+           ::the-reef
+           {[0 0] (assoc (::the-plunge-reef universal-rooms)
+                         ::room-index 0)
+            [0 1] (merge (::the-great-barrier universal-rooms)
+                         {::situation (generate {::floor level} [::situation])
+                          ::room-index 1})}
            {[0 0] (assoc (::the-plunge universal-rooms) ::room-index 0)})
    ::floor level
    ::exit-index (roll 1 10 2)})
