@@ -45,10 +45,7 @@
 
 (defn add-empty-rooms
   [floor-map]
-  (let [{:keys [max-x min-x max-y min-y]} (db/get-map-bounds floor-map)
-        ;; If I need to even out columns again in the future:
-        ;; x-range (max (db/abs max-x) (db/abs min-x))
-        ]
+  (let [{:keys [max-x min-x max-y min-y]} (db/get-map-bounds floor-map)]
     (merge
      (apply merge (for [x (range min-x (inc max-x))
                         y (range min-y (inc max-y))]

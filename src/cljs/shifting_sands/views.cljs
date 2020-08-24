@@ -599,6 +599,43 @@
 (def starting-character-keys (concat db/character-traits
                                      db/starting-equipment))
 
+(defn bonus->ability-str [b]
+  (str (+ 10 b) "/+" b))
+
+(defn stat-row
+  [stat [s1 s2 s3]]
+  [re-com/h-box
+   :children
+   [[:span {:class "stat-left mono"} (name stat)]
+    [:span {:class "stat-right montserrat"} (str s1)]
+    [:span {:class "stat-right montserrat"} (str s2)]
+    [:span {:class "stat-right montserrat"} (str s3)]]])
+
+(defn stat-block
+  [stats]
+  [:div {:class "character-right"
+         :style {:display "block"}}
+   [re-com/v-box
+    :width "auto"
+    :children
+    [[re-com/h-box
+      :style {:align-contents "center"}
+      :children
+      [[:span {:class "stat-left stats-header"} "Prev ad:"]
+       [:span {:class "stat-right stats-header"} "11-14"]
+       [:span {:class "stat-right stats-header"} "15-18"]
+       [:span {:class "stat-right stats-header"} "19-20"]]]
+     (for [stat db/stats]
+       ^{:key (str stat)} [stat-row stat (get stats stat)])]]])
+
+(defn stats-row
+  [stats]
+  [re-com/h-box
+   :class "character-odd"
+   :children [[:span {:class "mono character-left"} "Ability Bonuses"]
+              [re-com/line :size "2px" :color aqua-green]
+              [stat-block stats]]])
+
 (defn character-row
   [even? character k]
   [re-com/h-box
@@ -630,6 +667,7 @@
          :on-click #(re-frame/dispatch [::events/generate-new-character])]
         [re-com/gap :size "20px"]]]
       [re-com/gap :size "5px"]
+      [stats-row (::db/stats character)]
       (for [[idx trait] (map-indexed vector starting-character-keys)]
         ^{:key idx} [character-row (even? idx) character trait])]]))
 

@@ -1675,6 +1675,7 @@
    ::the-twilight "The Twilight"
    ::the-trench "The Trench"})
 
+(def stats [::str ::dex ::con ::int ::wis ::cha])
 (def dirs #{:north :east :south :west})
 (def dir-map {:north [0 -1] :east [1 0] :south [0 1] :west [-1 0]})
 (def opposite-dir {:north :south :east :west :south :north :west :east})
@@ -1704,6 +1705,10 @@
 (s/def ::slug-effect (set slug-effects))
 
 ;; New Character
+(s/def ::stat (set stats))
+(s/def ::score (s/and int? #(>= 6 % 1)))
+(s/def ::scores (s/tuple ::score ::score ::score))
+(s/def ::stats (s/map-of ::stat ::scores))
 (s/def ::speech (set speech))
 (s/def ::hair (set hair))
 (s/def ::height (set height))
@@ -1740,7 +1745,8 @@
 (s/def ::new-character (s/keys :req [::speech ::hair ::height ::face
                                      ::clothing ::physique ::passion
                                      ::general-gear-1 ::general-gear-2
-                                     ::armor ::weapon ::dungeoneering-gear]))
+                                     ::armor ::weapon ::dungeoneering-gear
+                                     ::stats]))
 (s/def ::db (s/keys :req [::current-room ::active-page ::room-adv
                           ::current-floor ::slugs ::floors ::history]
                     :opt [::new-character]))
@@ -2242,9 +2248,18 @@
    ::general-gear-2 (::name (generate nil [::general-gear2]))
    ::dungeoneering-gear (::description (generate nil [::dungeoneering-gear]))})
 
+(defn roll-stats []
+  (repeatedly 3 (partial roll 1 6)))
+
+(defn generate-stat-block []
+  (->> (repeatedly 6 roll-stats)
+       (map (comp vec sort))
+       (zipmap stats)))
+
 (defn generate-new-character []
   (-> (into {} (map (juxt identity generate-trait) character-traits))
-      (merge (generate-starting-equipment))))
+      (merge (generate-starting-equipment))
+      (assoc ::stats (generate-stat-block))))
 
 (defn init-floor
   "Initiate a floor in the db for the given level e.g. :pelagic"

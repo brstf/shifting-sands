@@ -60,7 +60,7 @@ Contains global menu options:
 
 ### New Character Attributes
 
-A separate page that generates all of the attributes of a new character except stats (because those depend on stats from the previous character, I might add something like that in the future though)
+A separate page that generates all of the attributes of a new character, including new Ability Bonuses. To find the Ability Bonus of the new character, for each attribute select the bonus in the column with the *previous* character's Ability Aefense for that ability (or the first column for the first generation).
 
 ## Dev - Getting Started
 

@@ -14,7 +14,7 @@ p {
     user-select: none; /* Standard */    
 }
 
-.mono {
+.mono, .stats-header {
     font-family: 'Major Mono Display', monospace;
 }
 
@@ -152,6 +152,32 @@ svg {
     max-height: 80%;
     overflow-y: auto;
 }
+
+.stats-header {
+    background-color: #679781;
+    color: #FFFFFF;
+    padding: 5px;
+}
+
+.stat-left {
+    width: 160px;
+    text-align: center;
+}
+
+.stat-left, .stat-right {
+    border-left-style: solid;
+    border-bottom-style: solid;
+    border-right-style: solid;
+    border-width: 1px;
+    border-color: #84c7a8;
+    /* #679781; */
+}
+
+.stat-right {
+    width: 85px;
+    text-align: center;
+}
+
 
 .character-header {
     background-color: #679781;
