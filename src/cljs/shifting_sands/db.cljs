@@ -833,6 +833,7 @@
                          "communicate with the Heirs to sell them:\n"
                          "{{shop-item}}")
       ::index #{7}
+      ::generate-fn ::fill-str-templates
       }
      {
       ::description "6 Gulltures stalk into the room."
@@ -1117,7 +1118,8 @@
                          "wielding a Treasure (roll on the Treasure table. "
                          "Another has two Spellpearls with {{spell}} and "
                          "{{spell}}")
-      ::index #{12}}
+      ::index #{12}
+      ::generate-fn ::fill-str-templates}
      {::description "A Vampire Squid stalks the Heirs"
       ::index #{13}}
      {::description "12 Deep Chum enter the room"
