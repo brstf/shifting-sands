@@ -2261,7 +2261,8 @@
 (defn generate-new-character []
   (-> (into {} (map (juxt identity generate-trait) character-traits))
       (merge (generate-starting-equipment))
-      (assoc ::stats (generate-stat-block))))
+      (assoc ::stats (generate-stat-block))
+      (assoc ::hp (roll 1 8))))
 
 (defn init-floor
   "Initiate a floor in the db for the given level e.g. :pelagic"

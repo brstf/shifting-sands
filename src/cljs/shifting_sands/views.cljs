@@ -31,9 +31,10 @@
        (apply str)))
 
 (defn keyword->display-str [k]
-  (->> (string/split (name k) #"-")
-       (map capitalize-first)
-       (string/join " ")))
+  (case k ::db/hp "HP"
+        (->> (string/split (name k) #"-")
+             (map capitalize-first)
+             (string/join " "))))
 
 (defn title []
   (let [name (re-frame/subscribe [::subs/name])]
@@ -596,7 +597,8 @@
         [reset-dialog]
         [history-dialog]]]]]))
 
-(def starting-character-keys (concat db/character-traits
+(def starting-character-keys (concat [::db/hp]
+                                     db/character-traits
                                      db/starting-equipment))
 
 (defn bonus->ability-str [b]
